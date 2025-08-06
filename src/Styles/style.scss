@@ -1,0 +1,19 @@
+html{
+  width: 100svw;
+  height: 100svh;
+  margin: 0 auto;
+  overflow: hidden; /* Обрезает контент за пределами */
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); /* Для визуализации границ */
+}
+#app{
+  background-color: var(--background-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+body{
+  margin: unset;
+  height: 100%;
+}
