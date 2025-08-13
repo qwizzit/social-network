@@ -1,22 +1,19 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {User} from "../Models/User.ts";
 import axios from "axios";
 
 const allUsers = ref<User[]>([]);
-console.log(allUsers.value);
 async function fetchData() {
   const regUsers= await axios.get('https://jsonplaceholder.typicode.com/users')
-  regUsers.data.forEach((user: User) => {
-    allUsers.value.push(user)
-  })
+  localStorage.setItem('users', JSON.stringify(regUsers));
 }
-fetchData()
+onMounted(fetchData);
 
 </script>
 
 <template>
-<RouterView :allUsers="allUsers"/>
+<RouterView />
 </template>
 
 <style lang="scss">

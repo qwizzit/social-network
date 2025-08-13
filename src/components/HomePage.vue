@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {User} from "../Models/User.ts";
 
-const props = defineProps<{
-  allUsers: User[]
-}>()
+// const props = defineProps<{
+//   allUsers: User[]
+// }>()
 </script>
 
 <template>
-  <button class="home-page" @click="$router.push('/signIn')">LogOut</button>
+  <button class="home-page" @click="$router.push('/signIn')">Log Out</button>
 </template>
 
 <style lang="scss">

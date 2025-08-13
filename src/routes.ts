@@ -10,17 +10,13 @@ export const router = createRouter({
             name: 'HomePage',
             path: '/',
             component: HomePage,
-            props: {
-                user: User
-            }
+
         },
         {
             name: 'SignIn',
             path: '/signIn',
             component: SignIn,
-            props: {
-                allUsers: 1
-            }
+
         }
     ]
 })
