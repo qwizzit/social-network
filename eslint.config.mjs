@@ -34,6 +34,7 @@ export default [
   },
   {
     rules: {
+      "@typescript-eslint/no-explicit-any": "error",
       "no-native-reassign": "error",
       'vue/no-unused-vars': 'error',
       "vue/require-default-prop": "off",

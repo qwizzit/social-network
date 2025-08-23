@@ -3,11 +3,11 @@ html{
   height: 100svh;
   margin: 0 auto;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 #app{
-  background-color: var(--background-color);
-  font-family: Arial;
+  background-color: var(--main-background-color);
+  font-family: Rockwell;
   display: flex;
   justify-content: center;
   align-items: center;

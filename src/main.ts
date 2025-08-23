@@ -1,11 +1,18 @@
-import { createApp } from 'vue'
+import {createApp } from 'vue'
 import './Styles/style.scss'
 import './Styles/Colors.scss'
 import App from './components/App.vue'
-import {createRouter, createWebHistory} from "vue-router";
-import SignIn from "./components/SignIn.vue";
-import HomePage from "./components/HomePage.vue";
-import {User} from "./Models/User.ts";
-import {router} from "./routes.ts";
+import {MainRouter} from "./Routes/MainRouter.ts";
+import {PublicRouter} from "./Routes/PublicRouter.ts";
+// Если в localstorage что-то хранится, то загружать publicrouter иначе mainrouter
+async function setupRouter() {
+    return localStorage.getItem('token') === null ? PublicRouter : MainRouter
+}
 
-createApp(App).use(router).mount('#app')
+setupRouter()
+    .then(currentRouter => {
+        createApp(App).use(currentRouter).mount('#app')
+        currentRouter.push(currentRouter.options.routes[0].path)
+
+    })
+    .catch(console.error);
