@@ -12,7 +12,6 @@ async function setupRouter() {
 setupRouter()
     .then(currentRouter => {
         createApp(App).use(currentRouter).mount('#app')
-        currentRouter.push(currentRouter.options.routes[0].path)
 
     })
     .catch(console.error);

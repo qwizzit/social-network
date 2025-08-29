@@ -1,27 +1,46 @@
 <script setup lang="ts">
 import {User} from "../Models/User.ts";
-import {debounce, getUsers} from "../composition/metods.ts";
+import {usersData} from "../composition/metods.ts";
 import {onMounted, ref} from "vue";
 import SpanSignIn from "./SpanSignIn.vue";
 import axios from "axios";
 import {AccessApi} from "../Api/AccessApi.ts";
 
-const isRightEmail = ref(false);
 const enteredEmail = ref('');
-const users = getUsers();
+const enteredPassword = ref('');
 async function fetchData() { // не нужно загружать когда залогинин
   const regUsers = await axios.get('https://jsonplaceholder.typicode.com/users')
+  const processedUsers = <User[]>[]
+  regUsers.data.forEach((user : User, index : number) => {
+    processedUsers[index] = new User(user.id, user.name,
+        user.username, user.email,
+        user.address, user.phone,
+        user.website, user.company);
+  })
+  localStorage.setItem('users', JSON.stringify(processedUsers))
+  console.log(localStorage)
 }
-onMounted(fetchData)
-const checkEmail = debounce(600, () => {
-  isRightEmail.value = users.data.some((account : User) => account.email === enteredEmail.value);
-});
-function handleInput(event: Event) {
-  console.log(HTMLInputElement)
-  enteredEmail.value = (event.target as HTMLInputElement).value;
-  checkEmail();
+onMounted(fetchData);
+const checkEmail = () => {
+  return usersData.getUsers().some((account : User) => account.email === enteredEmail.value);
+};
+function handleInput(data: 'password' | 'email', event: Event) {
+  if(data === 'email'){
+    enteredEmail.value = (event.target as HTMLInputElement).value
+
+  } else if(data === 'password'){
+    enteredPassword.value = (event.target as HTMLInputElement).value
+  }
 }
-// $router.push('/')
+function isDataRight(){
+  const isRightEmail = checkEmail()
+  if(isRightEmail){
+    AccessApi.logIn()
+  } else{
+    console.log('Invalid email')
+  }
+}
+
 </script>
 
 <template>
@@ -34,15 +53,17 @@ function handleInput(event: Event) {
         class="input"
         placeholder="Email"
         type="email"
-        @input="handleInput"
+        value="Shanna@melissa.tv"
+        @input="handleInput('email', $event)"
       >
       <input
         class="input"
         placeholder="Password"
         type="password"
+        @input="handleInput('password', $event)"
       >
     </div>
-    <button class="login" @click="AccessApi.logIn()">
+    <button class="login" @click="isDataRight">
       Sign In
     </button>
   </div>
