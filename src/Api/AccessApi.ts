@@ -1,6 +1,6 @@
 export const AccessApi = {
-    logIn(){
-        localStorage.setItem('token', 'asd')
+    logIn(id: number){
+        localStorage.setItem('token', id.toString());
         window.location.reload();
     },
     logOut(){

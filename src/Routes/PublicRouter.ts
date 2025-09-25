@@ -1,18 +1,18 @@
 import {createRouter, createWebHistory} from "vue-router";
-import SignIn from "../components/SignIn.vue";
+import PublicComponent from "../components/PublicComponent.vue";
 
 export const PublicRouter = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            name: 'SignIn',
-            path: '/signIn',
-            component: SignIn,
+            name: 'PublicComponent',
+            path: '/signin',
+            component: PublicComponent,
+            meta: { requiresAuth: false },
         },
-        // {
-        //     name: 'NotFoundPages',
-        //     path: '/:pathMatch(.*)*',
-        //     component: SignIn,
-        // },
+        {
+            path: '/:pathMatch(.*)*',
+            redirect: '/signin',
+        },
     ]
 })

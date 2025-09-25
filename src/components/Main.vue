@@ -2,8 +2,7 @@
 import {onMounted, ref} from "vue";
 import {AccessApi} from "../Api/AccessApi.ts";
 import axios from "axios";
-import {Album} from "../Models/UserAlbums.ts";
-import {Photo} from "../Models/AlbumPhotos.ts";
+import {AlbumDto} from "../Models/Dto/AlbumDto.ts";
 import userCircle from "/src/assets/icons/user-circle-svgrepo-com.svg"
 import bell from "/src/assets/icons/bell-svgrepo-com.svg"
 import chatUnread from "/src/assets/icons/chat-round-svgrepo-com.svg"
@@ -12,193 +11,165 @@ import news from "/src/assets/icons/mailbox-svgrepo-com.svg"
 import interviews from "/src/assets/icons/microphone-svgrepo-com.svg"
 import home from "/src/assets/icons/star-svgrepo-com.svg"
 import contacts from "/src/assets/icons/users-group-rounded-svgrepo-com.svg"
+import {isUser} from "../composition/metods.ts";
+
 const isAvatar = ref(false)
+function fetchData() {
+  axios.get('https://jsonplaceholder.typicode.com/albums')
+      .then(resp => localStorage.setItem('albums', JSON.stringify(resp.data)));
 
-
-async function fetchData() {
-  const albums = await axios.get('https://jsonplaceholder.typicode.com/albums')
-  const photos = await axios.get('https://jsonplaceholder.typicode.com/photos')
-  const processedAlbums = <Album[]>[]
-  albums.data.forEach((album : Album, index : number) => {
-    processedAlbums[index] = new Album(album.userId, album.id, album.title)
-  })
-  const processedPhotos = <Photo[]>[]
-  photos.data.forEach((photo : Photo, index : number) => {
-    processedPhotos[index] = new Photo(photo.albumId, photo.id,
-        photo.title, photo.url, photo.thumbnailUrl)
-  })
-  // сделать асинхронным загрузку данных (albums, photos), после получения данных отправляется в localstorage
-  // сделать все классы в interface и в отдельную папку {entity}Dto
-  localStorage.setItem('albums', JSON.stringify(processedAlbums));
-  localStorage.setItem('photos', JSON.stringify(processedPhotos));
-}
+  axios.get<AlbumDto[]>('https://jsonplaceholder.typicode.com/photos')
+      .then(resp => localStorage.setItem('photos', JSON.stringify(resp.data)));
+ }
 
 onMounted(fetchData);
 </script>
 
 <template>
   <div class="full-page">
-    <nav class="top-navigation-bar">
+    <nav class="top-navigation-bar token-style">
       <img
         alt=""
         class="logo"
         src=""
       >
       <div class="search-content">
-        <input class="search-input">
-        <button class="create">
+        <input class="search-input token-style">
+        <button class="create token-style">
           Create
         </button>
-        <button class="assistant">
+        <button class="assistant token-style">
           Assistant
         </button>
       </div>
       <div class="user-implecation">
         <bell class="bell" />
         <div class="avatar-menu">
-          <userCircle class="avatar" @click="isAvatar = !isAvatar" />
-          <ul v-if="isAvatar" class="drop-down-list">
+          <userCircle class="avatar token-style" @click="isAvatar = !isAvatar" />
+          <!--          <teleport to="body"> -->
+          <ul
+            v-if="isAvatar"
+            class="drop-down-list token-style"
+          >
             <li class="btn-list">
               <button class="btn">
                 asd
               </button>
-              <button class="btn" @click="AccessApi.logOut()">
+              <button class="btn token-style" @click="AccessApi.logOut()">
                 LogOut
               </button>
             </li>
           </ul>
+          <!--          </teleport> -->
         </div>
       </div>
     </nav>
     <div class="page">
       <nav id="navigation" class="navigation">
         <RouterLink
-          class="phones-router"
-          to="/"
+          class="phones-router token-style"
+          :to="{name: 'Home', params: {id: isUser.id()}}"
         >
           <home class="icon-router" />
-          Home
+          <span class="router-text">Home</span>
         </RouterLink>
         <RouterLink
-          class="phones-router"
-          to="/messages"
+          class="phones-router token-style"
+          :to="{name: 'MessagesPage', params: {id: isUser.id()}}"
         >
           <chatUnread class="icon-router" />
-          Messages
+          <span class="router-text">Messages</span>
         </RouterLink>
         <RouterLink
-          class="router"
+          class="router token-style"
           to=""
         >
           <interviews class="icon-router" />
-          Interviews
+          <span class="router-text">Interviews</span>
         </RouterLink>
-        <RouterLink class="phones-router" to="">
+        <RouterLink class="phones-router token-style" to="">
           <news class="icon-router" />
-          News
+          <span class="router-text">News</span>
         </RouterLink>
-        <RouterLink class="router" to="">
+        <RouterLink class="router token-style" to="">
           <contentFire class="icon-router" />
-          Content
+          <span class="router-text">Content</span>
         </RouterLink>
-        <RouterLink class="phones-router" to="">
+        <RouterLink class="phones-router token-style" to="">
           <contacts class="icon-router" />
-          Contacts
+          <span class="router-text">Contacts</span>
         </RouterLink>
       </nav>
       <main class="content">
         <RouterView />
-      <!--        <div class="short-pictures-content"> -->
-      <!--          <img -->
-      <!--            alt="" -->
-      <!--            class="short-content" -->
-      <!--            src="" -->
-      <!--          > -->
-      <!--          <img -->
-      <!--            alt="" -->
-      <!--            class="short-content" -->
-      <!--            src="" -->
-      <!--          > -->
-      <!--          <img -->
-      <!--            alt="" -->
-      <!--            class="short-content" -->
-      <!--            src="" -->
-      <!--          > -->
-      <!--        </div> -->
-      <!--        <div class="all-info"> -->
-      <!--          11 -->
-      <!--        </div> -->
       </main>
-      <div class="additional-content">
-        123
+      <div class="additional-content token-style">
+        <div class="asd token-style">
+          123
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
-%token-style {
-  border: var(--border);
-  color: var(--font-color);
-  background: var(--main-background-color);
+
+.token-style {
+  border: rgba(var(--color-border), 0.38);
+  color: rgba(var(--color-font), 1);
+  background: rgba(var(--color-main-bg), 1);
   border-radius: 15px;
   width: 100%;
   height: 100%;
 }
-
 .full-page {
-  display: grid;
-  background: var(--main-background-color);
-  grid-template-rows: 60px 1fr;
+  overflow-y: scroll;
+  background: rgba(var(--color-main-bg), 1);
   width: 100%;
-  gap: 30px;
   height: 100%;
   .top-navigation-bar {
     display: flex;
-    @extend %token-style;
     border-radius: unset;
-    background: var(--secondary-background-color);
-    justify-content: space-evenly;
+    position: fixed;
+    gap: 150px;
+    padding: 0 10px;
+    border-bottom:  1px solid rgba(var(--color-border-blocks), 1);
+    height: 60px;
+    background: rgba(var(--color-second-bg), 1);
+    justify-content: center;
     align-items: center;
     width: 100%;
     .logo {
       display: block;
-      max-width: 55px;
-      max-height:  55px;
-      width: 100%;
-      height: 100%;
+      width: 55px;
+      height:  55px;
     }
 
     .search-content {
       max-width: 650px;
       width: 100%;
-      height: 100%;
       display: flex;
-      justify-content: space-around;
+      gap: 25px;
       align-items: center;
       .search-input {
-        @extend %token-style;
-        max-height: 40px;
-        max-width: 400px;
+        height: 40px;
       }
       .create {
-        @extend %token-style;
         display: block;
-        background: var(--btn-background-color);
-        box-shadow: -1px 2px var(--btn-box-shadow);
-        max-width: 100px;
-        max-height: 40px;
+        background: rgba(var(--color-btn-background), 1);
+        box-shadow: -1px 2px rgba(var(--color-btn-box-shadow), 0.5);
+        width: 140px;
+        height: 40px;
         border: unset;
         border-radius: 15px;
       }
 
       .assistant {
-        @extend %token-style;
         display: block;
-        background: var(--btn-background-color);
-        box-shadow: -1px 2px var(--btn-box-shadow);
-        max-width: 100px;
-        max-height: 40px;
+        background: rgba(var(--color-btn-background), 1);
+        box-shadow: -1px 2px rgba(var(--color-btn-box-shadow), 0.5);
+        width: 140px;
+        height: 40px;
         border: unset;
         border-radius: 15px;
       }
@@ -214,38 +185,29 @@ onMounted(fetchData);
       .bell {
         display: block;
         background: unset;
-        color: var(--font-color);
+        color: rgba(var(--color-font), 1);
         border: unset;
-        max-width: 30px;
-        width: 100%;
-        height: 100%;
+        width: 30px;
       }
       .avatar-menu{
         display: flex;
         justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        max-width: 60px;
-        position: relative;
+        width: 60px;
         .avatar{
-          @extend %token-style;
+          cursor:  pointer;
           border-radius: unset;
           background: unset;
-          max-width: 50px;
         }
         .drop-down-list{
-          @extend %token-style;
-          position: absolute;
+          max-height: 350px;
+          position: fixed;
+          z-index: 3;
           top: 50px;
           padding: unset;
-          min-width: 200px;
-          min-height: 400px;
-          border: 2px solid var(--border);
-          //max-width: 300px;
-          //max-height: 300px;
+          max-width: 200px;
+          border: 2px solid rgba(var(--color-border), 0.38);
           list-style: none;
-          background: var(--main-background-color);
+          background: rgba(var(--color-main-bg), 1);
           .btn-list{
             display: flex;
             flex-direction: column;
@@ -254,10 +216,9 @@ onMounted(fetchData);
             justify-content: space-evenly;
             align-items: center;
             .btn{
-              @extend %token-style;
-              background: var(--btn-background-color);
+              background: rgba(var(--color-btn-background), 1);
               max-width: 150px;
-              max-height: 50px;
+              height: 50px;
             }
 
           }
@@ -267,46 +228,40 @@ onMounted(fetchData);
   }
 
   .page {
-    display: flex;
+    display: grid;
+    gap: var(--gap-page);
+    padding-top: 10px;
+    margin-top: var(--margin-top-page);
     justify-content: center;
-    align-items: start;
-    gap: 40px;
-    background: unset;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
+    grid-template-columns: 310px auto 310px;
     .navigation {
       max-width: 300px;
       display: flex;
-      max-height: 500px;
       flex-direction: column;
-      justify-content: space-evenly;
+      gap: var(--gap-navigation);
       align-items: center;
       height: 100%;
       width: 100%;
 
       .router {
-        @extend %token-style;
         display: flex;
         text-decoration: none;
-        gap: 10px;
+        gap: var(--gap-picture);
         padding-left: 20px;
         align-items: center;
         align-content: center;
         min-width: 150px;
         max-width: 250px;
-        max-height: 50px;
-        background: var(--secondary-background-color);
+        height: 50px;
+        background: rgba(var(--color-second-bg), 1);
         .icon-router{
-          max-width: 25px;
-          width: 100%;
-          height: 100%;
+          width: 25px;
+          height: 25px;
         }
       }
       .phones-router{
-        @extend %token-style;
         display: flex;
-        gap: 10px;
+        gap: var(--gap-picture);
         padding-left: 20px;
         align-content: center;
         min-width: 150px;
@@ -314,34 +269,35 @@ onMounted(fetchData);
         user-select: none;
         align-items: center;
         max-width: 250px;
-        max-height: 50px;
-        background: var(--secondary-background-color);
+        height: 50px;
+        background: rgba(var(--color-second-bg), 1);
         .icon-router{
-          max-width: 25px;
-          width: 100%;
-          height: 100%;
+          width: 25px;
+          height: 25px;
         }
       }
     }
 
     .content {
-      @extend %token-style;
-      height: auto;
-      aspect-ratio:  1 / 1;
-      max-width: 800px;
-      min-width: 400px;
+
+      color: rgba(var(--color-font), 1);
+      padding: 0 10px;
+      gap: 20px;
+      display: flex;
+      flex-direction: column;
       .short-pictures-content {
-        @extend %token-style;
+        width: auto;
         height: auto;
-        aspect-ratio: 3 / 1;
+        gap: 15px;
+        padding: 5px;
         display: flex;
         justify-content: space-around;
         align-items: center;
         max-width: 800px;
 
         .short-content {
-          @extend %token-style;
           height: auto;
+          background: white;
           aspect-ratio: 1 / 1;
           display: flex;
           justify-content: center;
@@ -354,22 +310,75 @@ onMounted(fetchData);
 
 
       .all-info {
-        @extend %token-style;
-        background: var(--secondary-background-color);
+        display: flex;
         height: auto;
-        aspect-ratio: 1 / 1;
-        max-width: 800px;
-        min-width: 450px;
+        flex-direction: column;
+        gap: var(--gap-posts);
+        align-items: center;
+        .post{
+          display: grid;
+          border: 2px solid rgba(var(--color-border-blocks), 1);
+          background: rgba(var(--color-second-bg), 1);
+          border-radius: 15px;
+          max-width: 630px;
+          padding: 15px;
+          gap: var(--gap-posts);
+          .user-post-avatar{
+            display: flex;
+            gap: var(--gap-picture);
+            align-items: center;
+            .post-avatar{
+              width: 40px;
+              height: 40px;
+            }
+          }
+          .post-interactive{
+            display: flex;
+            gap: 20px;
+            max-height: 30px;
+            .like{
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              .post-icon{
+                cursor: pointer;
+                width: 25px;
+                height: 25px;
+                transition: stroke 0.2s, transform 0.1s;
+              }
+              .post-icon:active{
+                stroke: tomato;
+                transform: scale(0.88);
+              }
+            }
+            .comment {
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              .post-icon{
+                height: 25px;
+                width: 25px;
+              }
+            }
+            .share{
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              .post-icon{
+                height: 25px;
+                width: 25px;
+              }
+            }
+          }
+        }
       }
     }
     .additional-content {
-      @extend %token-style;
-      background: var(--secondary-background-color);
-      height: auto;
-      aspect-ratio:  1 / 1;
-      min-width: 400px;
-      max-width: 600px;
-      max-height: 700px;
+      padding: 0 10px;
+      .asd{
+        background: rgba(var(--color-second-bg), 1);
+        aspect-ratio:  1 / 1;
+        }
     }
   }
 
@@ -381,12 +390,13 @@ onMounted(fetchData);
       justify-content: center;
     }
     .page{
+      grid-template-columns: 310px auto;
       justify-content: flex-start;
       .content {
-        max-width: 650px;
         .all-info{
-          min-width: 650px;
-          max-width: 800px;
+          .post{
+            max-width: unset;
+          }
         }
       }
       .additional-content{
@@ -398,9 +408,7 @@ onMounted(fetchData);
 
 @media (max-width: 992px) {
   .full-page{
-    gap: unset;
     .top-navigation-bar {
-      gap: 20px;
       justify-content: center;
       .logo{
         display: none;
@@ -431,10 +439,13 @@ onMounted(fetchData);
       }
     }
     .page{
+      justify-content: center;
       min-width: 400px;
       .content {
         .all-info {
           min-width: 350px;
+
+        ;
         }
       }
     }
@@ -444,15 +455,12 @@ onMounted(fetchData);
 @media (max-width: 768px) {
   .full-page {
     .top-navigation-bar {
-      background: var(--secondary-background-color);
+      gap: 50px;
+      background: rgba(var(--color-second-bg), 1);
       justify-content: center;
       .search-content {
         max-width: 380px;
-
         .search-input {
-          @extend %token-style;
-          max-width: 350px;
-          max-height: 40px;
         }
 
         .create {
@@ -465,9 +473,6 @@ onMounted(fetchData);
       }
 
       .user-implecation {
-        display: flex;
-        max-width: 55px;
-
         .bell {
           display: none;
         }
@@ -475,21 +480,12 @@ onMounted(fetchData);
     }
 
     .page {
-      display: flex;
-      gap: unset;
-      aspect-ratio: unset;
-      justify-content: space-between;
-      flex-direction: column-reverse;
+      grid-template-columns: 1fr;
+      justify-content: center;
 
       .content {
-        display: flex;
-        min-width: unset;
+        grid-row-start: 1;
         max-width: none;
-        max-height: 875px;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
 
         .short-pictures-content {
           display: flex;
@@ -498,8 +494,6 @@ onMounted(fetchData);
           max-height: 150px;
 
           .short-content {
-            @extend %token-style;
-            border-radius: unset;
             max-width: 125px;
             max-height: 125px;
             background: white;
@@ -508,8 +502,8 @@ onMounted(fetchData);
 
         .all-info {
           min-width: 100px;
-          max-height: 500px;
-          max-width: 600px;
+          max-height: unset;
+          margin-bottom: calc(var(--size-phones-router) + var(--gap-posts));
         }
       }
 
@@ -518,20 +512,25 @@ onMounted(fetchData);
       }
 
       #navigation {
+        position: fixed;
+        max-height: var(--size-phones-router);
+        border-top: 1px solid rgba(var(--color-border), 0.38);
+        bottom: 0;
+        z-index: 3;
         max-width: none;
-        max-height: 60px;
         flex-direction: row;
         align-items: flex-end;
-
+        gap: unset;
         .phones-router {
           padding-left: unset;
           min-width: unset;
-
+          height: 100%;
           justify-content: center;
           border-radius: unset;
-          border-top: 1px solid var(--border);
-          background: var(--secondary-background-color);
-          text-indent: -9999px;
+          background: rgba(var(--color-second-bg), 1);
+          .router-text{
+            display: none;
+          }
         }
 
         .router {
@@ -553,7 +552,7 @@ onMounted(fetchData);
       .user-implecation {
         .avatar-menu{
           .drop-down-list {
-            left: -140px
+            right: 10px;
           }
         }
       }
@@ -562,16 +561,12 @@ onMounted(fetchData);
       min-width: 200px;
       .content{
         .short-pictures-content {
+          gap: 10px;
           max-height: 200px;
           .short-content {
-            max-height: 110px;
+            min-width: unset;
             max-width: 110px;
           }
-        }
-        .all-info{
-          max-height: 575px;
-          max-width: 350px;
-          aspect-ratio: 1 / 4;
         }
       }
     }
@@ -580,11 +575,15 @@ onMounted(fetchData);
 
 @media (max-width: 420px) {
   .full-page{
-    .page{
-      .content{
-        .all-info{
-          max-width: 350px;
-          max-height: 415px;
+    .top-navigation-bar {
+      .search-content{
+        width: auto;
+      }
+      .user-implecation {
+        .avatar-menu{
+          .drop-down-list {
+            right: 20px
+          }
         }
       }
     }

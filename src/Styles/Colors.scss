@@ -1,12 +1,14 @@
 // back rgba(36, 36, 36, 1)
 :root{
   // переделать
-  --main-background-color: rgba(23, 23, 23);
-  --secondary-background-color: rgba(39, 39, 39);
-  --btn-box-shadow: rgba(11, 70, 163, 0.5);
-  --input-background-color: rgba(37, 37, 37);
-  --font-color: rgba(186, 186, 186);
-  --placeholder-color: rgba(0, 128, 255, 0.68);
-  --border: rgba(0, 138, 209, 0.38);
-  --btn-background-color: rgba(0, 74, 179);
+
+  --color-main-bg: 23, 23, 23;
+  --color-second-bg: 39, 39, 39;
+  --color-btn-box-shadow: 11, 70, 163;
+  --color-input-background: 37, 37, 37;
+  --color-font: 186, 186, 186;
+  --color-placeholder: 0, 128, 255;
+  --color-border: 0, 138, 209;
+  --color-border-blocks: 30, 30, 30;
+  --color-btn-background: 0, 74, 179;
 }
