@@ -14,6 +14,7 @@ import contacts from "/src/assets/icons/users-group-rounded-svgrepo-com.svg"
 import {isUser} from "../composition/metods.ts";
 
 const isAvatar = ref(false)
+
 function fetchData() {
   axios.get('https://jsonplaceholder.typicode.com/albums')
       .then(resp => localStorage.setItem('albums', JSON.stringify(resp.data)));
@@ -131,14 +132,13 @@ onMounted(fetchData);
     display: flex;
     border-radius: unset;
     position: fixed;
-    gap: 150px;
+    gap: var(--gap-top-navigation);
     padding: 0 10px;
     border-bottom:  1px solid rgba(var(--color-border-blocks), 1);
     height: 60px;
     background: rgba(var(--color-second-bg), 1);
     justify-content: center;
     align-items: center;
-    width: 100%;
     .logo {
       display: block;
       width: 55px;
@@ -247,7 +247,7 @@ onMounted(fetchData);
         display: flex;
         text-decoration: none;
         gap: var(--gap-picture);
-        padding-left: 20px;
+        padding-left: var(--padding-left-router);
         align-items: center;
         align-content: center;
         min-width: 150px;
@@ -262,7 +262,7 @@ onMounted(fetchData);
       .phones-router{
         display: flex;
         gap: var(--gap-picture);
-        padding-left: 20px;
+        padding-left: var(--padding-left-router);
         align-content: center;
         min-width: 150px;
         text-decoration: none;
@@ -387,7 +387,14 @@ onMounted(fetchData);
 @media (max-width: 1200px) {
   .full-page{
     .top-navigation-bar{
+      gap: calc(var(--gap-top-navigation) / 2);
       justify-content: center;
+      .search-content{
+        max-width: 500px;
+        .assistant{
+          display: none;
+        }
+      }
     }
     .page{
       grid-template-columns: 310px auto;
@@ -473,6 +480,11 @@ onMounted(fetchData);
       }
 
       .user-implecation {
+        .avatar-menu{
+          .drop-down-list {
+            right: 10px;
+          }
+        }
         .bell {
           display: none;
         }
@@ -545,6 +557,7 @@ onMounted(fetchData);
   .full-page{
     .top-navigation-bar {
       .search-content{
+        width: auto;
         min-width: 200px;
         max-width: 300px;
         padding-left: 15px;
@@ -566,23 +579,6 @@ onMounted(fetchData);
           .short-content {
             min-width: unset;
             max-width: 110px;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 420px) {
-  .full-page{
-    .top-navigation-bar {
-      .search-content{
-        width: auto;
-      }
-      .user-implecation {
-        .avatar-menu{
-          .drop-down-list {
-            right: 20px
           }
         }
       }

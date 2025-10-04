@@ -30,7 +30,6 @@ export const isUser ={
     id: () =>{
         return localStorage.getItem('token')
     }
-
 }
 
 export function debounce(delay: number, fn: CallableFunction) {

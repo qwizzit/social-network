@@ -13,8 +13,8 @@ export const MainRouter = createRouter({
             path: '/user/:id',
             name: 'Main',
             component: Main,
-            beforeEnter: (to) =>{
-                if(!to.params.id || to.params.id !== isUser.id()) {
+            beforeEnter: (to) =>{ // сделать cosnt
+               if(!to.params.id || to.params.id !== isUser.id()) {
                     return `/user/${isUser.id()}/home`;
                 }
             },
@@ -44,11 +44,8 @@ export const MainRouter = createRouter({
             redirect: () => {
                 if(isUser.isAuthenticated()) {
                     return `/user/${isUser.id()}/home`;
-                } else{
-                    AccessApi.logOut()
-                    return ''
                 }
-
+                return '' // редирект на home и от
             },
         },
     ]

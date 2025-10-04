@@ -5,17 +5,17 @@ html{
   overflow: hidden;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
+@font-face {
+  font-family: 'CustomFont';
+  src: url('src/assets/fonts/FindSansPro-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
-//@font-face {
-//  font-family: 'CustomFont';
-//  src: url('src/assets/fonts/FindSansPro-Regular.woff') format('woff');
-//  font-weight: normal;
-//  font-style: normal;
-//}
 #app{
 
   background-color: rgba(var(--color-main-bg), 1);
-  //font-family: CustomFont;
+  font-family: CustomFont;
   //display: flex;
   //justify-content: center;
   //align-items: center;

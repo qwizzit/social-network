@@ -5,6 +5,7 @@ import {onMounted, ref} from "vue";
 import {randomUserPost} from "../Models/InterfaceRandomUserPost.ts";
 
 const posts = ref<randomUserPost[]>([])
+// const uploadedPosts = ref<string[]>([])
 const allUsers = usersData.getUsers()
 const userAndPhoto = randomPhoto(randomUser());
 
@@ -24,12 +25,14 @@ function fetchPosts() {
   }
 }
 function randomPost() {
+  // могут загрузиться несколько раз одни и те же посты - исправить это
   const allPosts = usersData.getPosts()
   let user = {userId: -1, userName: '', photoUrl: '', post: {id: '', body: '', title: ''}}
   user.userId = getRandomInt(1, 10);
   user.userName = allUsers[user.userId - 1].name;
   const post = getRandomInt((user.userId - 1) * 10 + 1, (user.userId - 1) * 10 + 10);
   user.post = allPosts[post];
+  // uploadedPosts.value.push(user.post.id);
   return user
 }
 onMounted(fetchPosts)

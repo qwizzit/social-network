@@ -7,7 +7,7 @@ import {AccessApi} from "../Api/AccessApi.ts";
 
 const enteredEmail = ref('');
 const enteredPassword = ref('');
-async function fetchData() { // не нужно загружать когда залогинин
+async function fetchData() {
   const regUsers = await axios.get('https://jsonplaceholder.typicode.com/users')
   const processedUsers = <UserDto[]>[]
   regUsers.data.forEach((user : UserDto, index : number) => {
