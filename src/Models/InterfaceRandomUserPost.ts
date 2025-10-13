@@ -3,7 +3,7 @@ export interface randomUserPost {
     userName: string;
     photoUrl: string;
     post: {
-        id: string;
+        id: number;
         body: string;
         title:  string;
     }

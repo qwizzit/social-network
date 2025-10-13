@@ -9,14 +9,7 @@ const enteredEmail = ref('');
 const enteredPassword = ref('');
 async function fetchData() {
   const regUsers = await axios.get('https://jsonplaceholder.typicode.com/users')
-  const processedUsers = <UserDto[]>[]
-  regUsers.data.forEach((user : UserDto, index : number) => {
-    processedUsers[index] = new UserDto(user.id, user.name,
-        user.username, user.email,
-        user.address, user.phone,
-        user.website, user.company);
-  })
-  localStorage.setItem('users', JSON.stringify(processedUsers))
+  localStorage.setItem('users', JSON.stringify(regUsers.data))
 }
 onMounted(fetchData);
 function checkEmail() {
@@ -119,7 +112,7 @@ function isDataRight(){
         color: rgba(var(--color-font), 1);
         padding-left: 20px;
         background-color: rgba(var(--color-input-background), 1);
-        border: 1px solid rgba(var(--color-border), 0.38);
+        border: 1px solid rgba(var(--color-border-main), 0.38);
         max-width: 500px;
         max-height: 50px;
         width: 100%;

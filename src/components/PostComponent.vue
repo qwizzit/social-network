@@ -10,7 +10,6 @@ const props = defineProps<{
 }>()
 const postLikes = ref(0)
 const currentColor = ref('white')
-
 postLikes.value = getRandomInt(1, 100)
 function changeColor(){
   if(currentColor.value === 'white'){
@@ -28,11 +27,13 @@ function changeColor(){
 <template>
   <div>
     <div class="user-post-avatar">
-      <img
-        alt=""
-        class="post-avatar"
-        :src="user.photoUrl"
-      >
+      <router-link :to="{name: 'Profile', params: {id: user.userId}}">
+        <img
+          alt=""
+          class="post-avatar"
+          :src="user.photoUrl"
+        >
+      </router-link>
       {{ user.userName }}
     </div>
     <div class="post-info">

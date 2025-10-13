@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
 import PublicComponent from "../components/PublicComponent.vue";
+import NotFound from "../components/NotFound.vue";
 
 export const PublicRouter = createRouter({
     history: createWebHistory(),
@@ -11,8 +12,9 @@ export const PublicRouter = createRouter({
             meta: { requiresAuth: false },
         },
         {
-            path: '/:pathMatch(.*)*',
-            redirect: '/signin',
+            path: '/:notFound(.*)*',
+            name: 'NotFound',
+            component: NotFound,
         },
     ]
 })

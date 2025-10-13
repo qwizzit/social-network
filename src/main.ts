@@ -2,6 +2,7 @@ import {createApp } from 'vue'
 import './Styles/style.scss'
 import './Styles/Colors.scss'
 import './Styles/Sizes.scss'
+import './Styles/variables.scss'
 import App from './components/App.vue'
 import {MainRouter} from "./Routes/MainRouter.ts";
 import {PublicRouter} from "./Routes/PublicRouter.ts";
