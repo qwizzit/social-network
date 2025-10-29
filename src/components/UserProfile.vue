@@ -5,11 +5,12 @@ import {randomPhoto, usersData} from "../composition/metods.ts";
 import {AlbumDto} from "../Models/Dto/AlbumDto.ts";
 import {PhotoDto} from "../Models/Dto/PhotoDto.ts";
 import leftArrow from "/src/assets/icons/left-arrow.svg";
+import {AlbumsApi} from "../Api/AccessApi.ts";
 const props = defineProps<{
   id: string,
 }>()
 const user = ref({mainInfo: {
-    id: -1, name: '', username: '', email: '',
+    id: parseInt(props.id), name: '', username: '', email: '',
     address: {
       street: '',
       suite: '',
@@ -100,7 +101,6 @@ function uploadPhotos(albumId: number) {
 
   const updatedPhotos = [...photosInAlbums.value];
   updatedPhotos[albumId - user.value.albums.firstAlbumId] = allPhotos.filter((photo: PhotoDto) => photo.albumId === albumId)
-  // console.log(albumId - user.value.albums.firstAlbumId)
   const index = openedAlbums.value.indexOf(albumId);
   if (index > -1) {
     openedAlbums.value.splice(index, 1);
@@ -123,8 +123,8 @@ onMounted(() => {
   <div class="full-profile">
     <div class="main-info token-style">
       <div class="something-name">
-        <router-link :to="{name: 'Content'}">
-          <leftArrow style="width: 25px; height: 25px;" />
+        <router-link class="go-home" :to="{name: 'Content'}">
+          <leftArrow class="go-home" />
         </router-link>
         <span class="name">{{ user.mainInfo.name }}</span>
       </div>
@@ -135,8 +135,7 @@ onMounted(() => {
           </div>
           <div class="addresses default-block">
             <a
-              class="contact-info token-style"
-              style="text-decoration: underline"
+              class="contact-info my-website token-style"
               :href="user.mainInfo.website"
             >{{ user.mainInfo.website }}</a>
             <span class="contact-info token-style">{{ user.mainInfo.email }}</span>
@@ -174,7 +173,7 @@ onMounted(() => {
               <div class="more-album-photos">
                 <a
                   v-if="!isAlbumOpened(albumId)"
-                  style="cursor: pointer; text-decoration: underline"
+                  class="btn-more-albums"
                   @click="uploadPhotos(albumId + user.albums.firstAlbumId)"
                 >
                   More pictures...
@@ -190,8 +189,8 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-            <div v-if="!isMoreAlbums && photosInAlbums.length > 3" style="padding-left: 10px">
-              <a style="cursor: pointer; text-decoration: underline" @click="isMoreAlbums = !isMoreAlbums">
+            <div v-if="!isMoreAlbums && photosInAlbums.length > 3">
+              <a class="btn-more-albums" @click="isMoreAlbums = !isMoreAlbums">
                 More albums... ({{ photosInAlbums.length - 3 }} left)
               </a>
             </div>
@@ -211,7 +210,7 @@ onMounted(() => {
             >
             <div class="company-addresses">
               <span class="company-address token-style">{{ user.mainInfo.company.name }}</span>
-              <span class="company-address token-style" style="display: block; align-items: unset">
+              <span id="need-an-ellipsis" class="company-address token-style">
                 {{ user.mainInfo.company.bs }}, {{ user.mainInfo.company.catchPhrase }}
               </span>
             </div>
@@ -240,9 +239,21 @@ onMounted(() => {
   width: 100%;
   height: 100%;
 }
-
-
-
+.go-home{
+  width: 25px;
+  height: 25px;
+}
+.my-website{
+  text-decoration: underline;
+}
+.btn-more-albums{
+  padding-left: 10px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+#need-an-ellipsis{
+  display: block;
+}
 .full-profile{
   padding: 0 10px;
   margin-top: calc(var(--size-top-navigation) + var(--gap-page));
@@ -312,6 +323,7 @@ onMounted(() => {
   .additional-info{
     display: flex;
     width: 100%;
+    overflow: hidden;
     margin-bottom: calc(var(--padding-profile-outer-blocks) + var(--padding-album-spacer));
     align-items: flex-start;
     gap: var(--gap-page);
@@ -336,11 +348,11 @@ onMounted(() => {
             width: 100%;
             overflow-x: auto;
             gap: var(--gap-page);
-            padding: 0 15px 15px 15px;
+            padding: 10px;
             border-bottom: var(--border-dark-subtle);
             .album-photo{
               background: white;
-              box-shadow: 0 0 20px black;
+              box-shadow: 0 0 10px rgba(var(--color-box-shadow-avatars), 1);
               border-radius: 12px;
               width: 135px;
               height: 135px;
@@ -397,7 +409,7 @@ onMounted(() => {
             width: 60px;
             height: 60px;
             background: white;
-            box-shadow: 0 0 20px black;
+            box-shadow: 0 0 20px rgba(var(--color-box-shadow-avatars), 1);
             border-radius: 50%;
           }
         }

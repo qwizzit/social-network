@@ -1,4 +1,7 @@
-import {createRouter, createWebHistory} from "vue-router";
+import {
+    createRouter,
+    createWebHistory
+} from "vue-router";
 import Main from "../components/Main.vue";
 import Messages from "../components/Messages.vue";
 import Content from "../components/Content.vue";
@@ -14,17 +17,13 @@ export const MainRouter = createRouter({
             path: '/',
             name: 'Main',
             component: Main,
-            // beforeEnter: (to) =>{ // сделать cosnt
-            //    if(!to.params.id || to.params.id !== isUser.id()) {
-            //         return `/user/${isUser.id()}/home`;
-            //     }
-            // },
-            redirect: "/home/content",
+            redirect: "/home",
             children: [
                 {
                     name: 'Home',
                     path: 'home',
                     component: Home,
+                    redirect: '/home/content',
                     children: [
                         {
                             name: 'Content',
@@ -41,7 +40,7 @@ export const MainRouter = createRouter({
                 },
                 {
                     name: 'Profile',
-                    path: 'user/:id',
+                    path: 'user/:id(\\d+)',
                     component: UserProfile,
                     props: true,
                 },
@@ -52,12 +51,12 @@ export const MainRouter = createRouter({
             name: 'NotFound',
             path: '/:notFound(.*)*',
             component: NotFound,
-            // redirect: () => {
-            //     if(isUser.isAuthenticated()) {
-            //         return `/home/content`;
-            //     }
-            //     return '' // редирект на home и от
-            // },
+            beforeEnter: (to) => {
+                if(to.path === '/signin'){
+                    return '/'
+                }
+                return true
+            },
         },
     ]
 })

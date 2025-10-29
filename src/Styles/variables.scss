@@ -1,3 +1,7 @@
 :root{
-  --border-dark-subtle: 5px solid rgb(76, 76, 76);
+}
+@media (prefers-color-scheme: dark) {
+  :root{
+
+  }
 }

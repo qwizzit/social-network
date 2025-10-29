@@ -4,9 +4,7 @@ import {onMounted, ref} from "vue";
 
 const currentComponent = ref(false)
 
-onMounted(() => {
-  currentComponent.value = localStorage.getItem('token') === null
-})
+currentComponent.value = localStorage.getItem('token') === null
 </script>
 
 <template>

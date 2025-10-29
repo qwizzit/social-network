@@ -6,7 +6,7 @@ import {randomUserPost} from "../Models/InterfaceRandomUserPost.ts";
 
 // localStorage.removeItem('uploadedPosts');
 const posts = ref<randomUserPost[]>([])
-// const uploadedPosts = ref<string[]>([])
+const postsId = <number[]>[]
 const allUsers = usersData.getUsers()
 const userAndPhoto = randomPhoto(randomUser());
 function fetchPosts() {
@@ -15,7 +15,13 @@ function fetchPosts() {
   if (!isPosts) {
     if(posts.value.length !== requiredNumberOfPosts) {
       for (let numberOfPost = 0; posts.value.length < requiredNumberOfPosts; numberOfPost++) {
-        posts.value[numberOfPost] = randomPost()
+        const newPost = randomPost()
+        if(newPost){
+          posts.value[numberOfPost] = newPost
+        } else{
+          numberOfPost--
+        }
+
       }
       localStorage.setItem("uploadedPosts", JSON.stringify(posts.value));
     }
@@ -24,15 +30,17 @@ function fetchPosts() {
   }
 }
 function randomPost() {
-  // могут загрузиться несколько раз одни и те же посты - исправить это
   const allPosts = usersData.getPosts()
   let user = {userId: -1, userName: '', photoUrl: '', post: {id: -1, body: '', title: ''}}
   user.userId = getRandomInt(1, 10);
   user.userName = allUsers[user.userId - 1].name;
   const post = getRandomInt((user.userId - 1) * 10 + 1, (user.userId - 1) * 10 + 10);
-  console.log(allPosts[post]);
-  user.post = allPosts[post];
-  return user
+  if(!postsId.includes(post)){
+    postsId.push(post);
+    user.post = allPosts[post];
+    return user
+  }
+  return undefined;
 }
 onMounted(fetchPosts)
 </script>
@@ -74,7 +82,6 @@ onMounted(fetchPosts)
   display: flex;
   justify-content: space-around;
   align-items: center;
-  max-width: 800px;
 
   .short-content {
     height: auto;
@@ -83,9 +90,6 @@ onMounted(fetchPosts)
     display: flex;
     justify-content: center;
     align-items: center;
-    //min-width: 100px;
-    //max-width: 200px;
-
   }
 }
 .all-info {
@@ -187,10 +191,6 @@ onMounted(fetchPosts)
   .short-pictures-content {
     gap: 10px;
     max-height: 200px;
-    .short-content {
-      //min-width: unset;
-      //max-width: 110px;
-    }
   }
 }
 </style>

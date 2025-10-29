@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, ref } from "vue";
 import {AccessApi} from "../Api/AccessApi.ts";
 import axios from "axios";
 import {AlbumDto} from "../Models/Dto/AlbumDto.ts";
@@ -9,6 +9,22 @@ import bell from "/src/assets/icons/bell-svgrepo-com.svg"
 import {isUser} from "../composition/metods.ts";
 
 const isAvatar = ref(false)
+const emit =  defineEmits<{
+  (e: 'update:darkTheme', value: typeof props.darkTheme): void
+}>()
+const props = defineProps<{
+  darkTheme: boolean,
+}>()
+
+function changeTheme() {
+  if(!props.darkTheme){
+    localStorage.setItem('theme', 'dark');
+    emit('update:darkTheme', true);
+  } else {
+    localStorage.setItem('theme', 'light');
+    emit('update:darkTheme', false);
+  }
+}
 
 function fetchData() {
   axios.get('https://jsonplaceholder.typicode.com/posts')
@@ -21,50 +37,57 @@ function fetchData() {
       .then(resp => localStorage.setItem('photos', JSON.stringify(resp.data)));
  }
 
-onMounted(fetchData);
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>
   <div class="full-page">
-    <nav class="top-navigation-bar token-style">
-      <router-link class="home token-style" :to="{name: 'Content', params: {}}">
-        <img
-          alt=""
-          class="logo"
-          src=""
-        >
-      </router-link>
-      <div class="search-content">
-        <input class="search-input token-style">
-        <button class="create token-style">
-          Create
-        </button>
-        <button class="assistant token-style">
-          Assistant
-        </button>
-      </div>
-      <div class="user-implecation">
-        <bell class="bell" />
-        <div class="avatar-menu">
-          <userCircle class="avatar token-style" @click="isAvatar = !isAvatar" />
-          <!--          <teleport to="body"> -->
-          <ul
-            v-if="isAvatar"
-            class="drop-down-list token-style"
+    <div class="top-navigation-bar">
+      <nav class="top-navigation token-style">
+        <router-link class="home token-style" :to="{name: 'Content', params: {}}">
+          <img
+            alt=""
+            class="logo"
+            src=""
           >
-            <li class="btn-list">
-              <router-link class="btn token-style" :to="{name: 'Profile', params: {id: isUser.id()}}">
-                Profile
-              </router-link>
-              <button class="btn token-style" @click="AccessApi.logOut()">
-                LogOut
-              </button>
-            </li>
-          </ul>
-          <!--          </teleport> -->
+        </router-link>
+        <div class="search-content">
+          <input class="search-input token-style">
+          <button class="create token-style">
+            Create
+          </button>
+          <button class="assistant token-style">
+            Assistant
+          </button>
         </div>
-      </div>
-    </nav>
+        <div class="user-implecation">
+          <bell class="bell" />
+          <div class="avatar-menu">
+            <userCircle class="avatar token-style" @click="isAvatar = !isAvatar" />
+            <!--          <teleport to="body"> -->
+            <ul
+              v-if="isAvatar"
+              class="drop-down-list token-style"
+            >
+              <li class="btn-list">
+                <router-link class="btn token-style" :to="{name: 'Profile', params: {id: isUser.id()}}">
+                  Profile
+                </router-link>
+                <button class="btn token-style" @click="changeTheme">
+                  ChangeTheme
+                </button>
+                <button class="btn token-style" @click="AccessApi.logOut()">
+                  LogOut
+                </button>
+              </li>
+            </ul>
+            <!--          </teleport> -->
+          </div>
+        </div>
+      </nav>
+    </div>
     <router-view />
   </div>
 </template>
@@ -79,118 +102,132 @@ onMounted(fetchData);
   height: 100%;
 }
 .full-page {
+
   display: flex;
   height: 100%;
   justify-content: center;
-  .top-navigation-bar {
-    display: flex;
+  .top-navigation-bar{
     top: 0;
-    gap: var(--gap-page);
-    border-radius: unset;
-    position: fixed;
-    padding: 0 10px;
-    z-index: 5;
-    border-bottom: 1px solid rgba(var(--color-border-blocks), 1);
-    height: var(--size-top-navigation);
-    background: rgba(var(--color-second-bg), 1);
+    display: flex;
     justify-content: center;
-    align-items: center;
-    justify-items: center;
-    .home{
+    background: rgb(var(--color-second-bg));
+    height: var(--size-top-navigation);
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    .top-navigation {
       display: flex;
-      justify-content: start;
-      background: none;
-      max-width: 310px;
-      height: 100%;
-      width: 100%;
+      gap: var(--gap-page);
+      border-radius: unset;
+      width: var(--width-page);
+      padding: 0 calc(10px + var(--padding-left-router));
+      border-bottom: 1px solid rgba(var(--color-border-blocks), 1);
+      background: rgba(var(--color-second-bg), 1);
+      justify-content: space-between;
       align-items: center;
-      .logo {
-        display: block;
-        width: 55px;
-        height:  55px;
-      }
-    }
-    .search-content {
-      max-width: 650px;
-      width: 100%;
-      display: flex;
-      gap: 25px;
-      align-items: center;
-      .search-input {
-        width: 550px;
-        border: unset;
-        height: 40px;
-      }
-      .create {
-        display: block;
-        background: rgba(var(--color-btn-background), 1);
-        box-shadow: -1px 2px rgba(var(--color-btn-box-shadow), 0.5);
-        width: 140px;
-        height: 40px;
-        border: unset;
-        border-radius: 15px;
-      }
-
-      .assistant {
-        display: block;
-        background: rgba(var(--color-btn-background), 1);
-        box-shadow: -1px 2px rgba(var(--color-btn-box-shadow), 0.5);
-        width: 140px;
-        height: 40px;
-        border: unset;
-        border-radius: 15px;
-      }
-    }
-    .user-implecation {
-      display: flex;
-      max-width: 300px;
-      padding-right:  calc(var(--size-drow-down-list) / 2.5);
-      width: 100%;
-      height: 100%;
-      gap: 30px;
-      justify-content: end;
-      align-items: center;
-      .bell {
-        display: block;
-        background: unset;
-        color: rgba(var(--color-font), 1);
-        border: unset;
-        width: 30px;
-        height: 30px;
-      }
-      .avatar-menu{
+      justify-items: center;
+      .home{
         display: flex;
-        justify-content: center;
-        width: 60px;
-        .avatar{
-          cursor:  pointer;
-          border-radius: unset;
-          background: unset;
+        justify-content: start;
+        background: none;
+        max-width: 150px;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        .logo {
+          display: block;
+          width: 55px;
+          height:  55px;
         }
-        .drop-down-list{
-          max-height: 350px;
-          position: fixed;
-          z-index: 3;
-          top: 50px;
-          padding: unset;
-          max-width: var(--size-drow-down-list);
-          border: 2px solid rgba(var(--color-border-main), 0.38);
-          list-style: none;
-          background: rgba(var(--color-main-bg), 1);
-          .btn-list{
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            justify-content: space-evenly;
-            align-items: center;
-            .btn{
+      }
+      .search-content {
+        max-width: 650px;
+        width: 100%;
+        display: flex;
+        padding: 0 10px;
+        gap: 25px;
+        align-items: center;
+        .search-input {
+          max-width: 550px;
+          border: unset;
+          height: 40px;
+        }
+        .create {
+          display: block;
+          background: rgba(var(--color-btn-background), 1);
+          box-shadow: -1px 2px rgba(var(--color-box-shadow-btn), 0.5);
+          width: 140px;
+          height: 40px;
+          border: unset;
+          border-radius: 15px;
+        }
+
+        .assistant {
+          display: block;
+          background: rgba(var(--color-btn-background), 1);
+          box-shadow: -1px 2px rgba(var(--color-box-shadow-btn), 0.5);
+          width: 140px;
+          height: 40px;
+          border: unset;
+          border-radius: 15px;
+        }
+      }
+      .user-implecation {
+        display: flex;
+        max-width: 150px;
+        width: 100%;
+        height: 100%;
+        gap: 30px;
+        justify-content: end;
+        align-items: center;
+
+        .bell {
+          display: block;
+          background: unset;
+          color: rgba(var(--color-font), 1);
+          border: unset;
+          width: 30px;
+          height: 30px;
+        }
+
+        .avatar-menu {
+          display: flex;
+          justify-content: center;
+          width: 60px;
+
+          .avatar {
+            cursor: pointer;
+            border-radius: unset;
+            background: unset;
+          }
+
+          .drop-down-list {
+            max-height: 350px;
+            position: fixed;
+            z-index: 3;
+            top: 50px;
+            padding: unset;
+            max-width: var(--size-drow-down-list);
+            border: 2px solid rgba(var(--color-border-main), 0.38);
+            list-style: none;
+            background: rgba(var(--color-main-bg), 1);
+
+            .btn-list {
               display: flex;
-              justify-content: center;
+              flex-direction: column;
+              width: 100%;
+              height: 100%;
+              justify-content: space-evenly;
               align-items: center;
-              background: rgba(var(--color-btn-background), 1);
-              max-width: 150px;
-              height: 50px;
+
+              .btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: rgba(var(--color-btn-background), 1);
+                max-width: 150px;
+                height: 50px;
+              }
             }
           }
         }
@@ -204,10 +241,11 @@ onMounted(fetchData);
     padding-top: 10px;
     margin-top: calc(var(--gap-page) + var(--size-top-navigation));
     justify-content: center;
-    grid-template-columns: calc(var(--width-page) / 4) 1fr;
+    grid-template-columns: calc(var(--width-page) / 5 ) 1fr;
     .navigation {
-      max-width: 300px;
+      //max-width: 300px;
       display: flex;
+      padding-left: var(--padding-left-router);
       flex-direction: column;
       gap: var(--gap-navigation);
       align-items: center;
@@ -221,7 +259,7 @@ onMounted(fetchData);
         align-items: center;
         align-content: center;
         min-width: 150px;
-        max-width: 250px;
+        max-width: var(--max-size-router);
         height: 50px;
         background: rgba(var(--color-second-bg), 1);
         .icon-router{
@@ -238,7 +276,7 @@ onMounted(fetchData);
         text-decoration: none;
         user-select: none;
         align-items: center;
-        max-width: 250px;
+        max-width: var(--max-size-router);
         height: 50px;
         background: rgba(var(--color-second-bg), 1);
         .icon-router{
@@ -274,21 +312,33 @@ onMounted(fetchData);
   }
 
 }
-
+@media (max-width: 1480px) {
+  .full-page {
+    .top-navigation-bar {
+      .top-navigation {
+        .user-implecation {
+          .avatar-menu {
+            .drop-down-list {
+              right: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 @media (max-width: 1200px) {
   .full-page{
-    .top-navigation-bar{
-      gap: calc(var(--gap-top-navigation) / 2);
-      justify-content: center;
-      .search-content{
-        max-width: 500px;
-        .assistant{
-          display: none;
+    .top-navigation-bar {
+      .navigation {
+        gap: calc(var(--gap-top-navigation) / 2);
+        .user-implecation {
+          max-width: unset;
+          width: auto;
         }
       }
     }
     .page{
-      grid-template-columns: 310px auto;
       justify-content: flex-start;
       .additional-content{
         display: none;
@@ -299,74 +349,52 @@ onMounted(fetchData);
 @media (max-width: 992px) {
   .full-page {
     .top-navigation-bar {
-      display: flex;
-      justify-content: center;
-
-      .home {
-        display: none;
-      }
-
-      .search-content {
-        max-width: 500px;
-        gap: 20px;
-
-        .assistant {
-          display: none;
+      .top-navigation {
+        .home {
+          width: 150px;
         }
-
-      }
-
-      .user-implecation {
-        padding-right: unset;
-        max-width: 55px;
-
-        .bell {
-          display: none;
+        .search-content {
+          gap: 20px;
         }
-
-        .avatar-menu {
-          .drop-down-list {
-            min-width: 180px;
-
-            .btn-list {
-              .btn {
-                max-width: 150px;
+        .user-implecation {
+          padding-right: unset;
+          max-width: 55px;
+          .bell {
+            display: none;
+          }
+          .avatar-menu {
+            .drop-down-list {
+              min-width: 180px;
+              .btn-list {
+                .btn {
+                  max-width: 150px;
+                }
               }
             }
           }
         }
       }
     }
-
-    .page {
-      justify-content: center;
-      min-width: 400px;
-    }
   }
 }
 @media (max-width: 768px) {
   .full-page {
     .top-navigation-bar {
-      gap: 50px;
-      background: rgba(var(--color-second-bg), 1);
-      justify-content: center;
-      .search-content {
-        max-width: 380px;
-        .create {
-          display: none;
+      .top-navigation {
+        gap: 10px;
+        .home {
+          max-width: unset;
+          width: auto;
         }
-        .assistant {
-          display: none;
-        }
-      }
-      .user-implecation {
-        .avatar-menu{
-          .drop-down-list {
-            right: 10px;
+        .user-implecation {
+          .avatar-menu {
+            .drop-down-list {
+              right: 10px;
+            }
           }
-        }
-        .bell {
-          display: none;
+          .bell {
+            display: none;
+          }
         }
       }
     }
@@ -376,12 +404,12 @@ onMounted(fetchData);
       .content {
         grid-row-start: 1;
         max-width: none;
-
       }
       .additional-content {
         display: none;
       }
       #navigation {
+        padding: unset;
         position: fixed;
         max-height: var(--size-phones-router);
         border-top: 1px solid rgba(var(--color-border-main), 0.38);
@@ -402,7 +430,6 @@ onMounted(fetchData);
             display: none;
           }
         }
-
         .router {
           display: none;
         }
@@ -410,26 +437,21 @@ onMounted(fetchData);
     }
   }
 }
-
 @media (max-width: 600px) {
   .full-page{
     .top-navigation-bar {
-      .search-content{
-        width: auto;
-        min-width: 200px;
-        max-width: 300px;
-        padding-left: 15px;
-      }
-      .user-implecation {
-        .avatar-menu{
-          .drop-down-list {
-            right: 10px;
+      .top-navigation {
+        .search-content {
+          min-width: 200px;
+          max-width: 400px;
+          .create {
+            display: none;
+          }
+          .assistant {
+            display: none;
           }
         }
       }
-    }
-    .page{
-      min-width: 200px;
     }
   }
 }

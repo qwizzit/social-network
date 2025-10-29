@@ -1,14 +1,27 @@
-// back rgba(36, 36, 36, 1)
-:root{
-  // переделать
-
+[data-theme="dark"] {
   --color-main-bg: 23, 23, 23;
   --color-second-bg: 39, 39, 39;
-  --color-btn-box-shadow: 11, 70, 163;
+  --color-box-shadow-btn: 11, 70, 163;
+  --color-box-shadow-avatars: 0, 0, 0;
   --color-input-background: 37, 37, 37;
   --color-font: 186, 186, 186;
   --color-placeholder: 0, 128, 255;
   --color-border-main: 186, 186, 186;
   --color-border-blocks: 30, 30, 30;
   --color-btn-background: 0, 74, 179;
+  --border-dark-subtle: 5px solid rgb(76, 76, 76);
+
+}
+[data-theme="light"] {
+  --color-main-bg: 255, 255, 255;
+  --color-second-bg: 225, 225, 225;
+  --color-box-shadow-btn: 11, 70, 163;
+  --color-box-shadow-avatars: 170, 170, 170;
+  --color-input-background: 37, 37, 37;
+  --color-font: 23, 23, 23;
+  --color-placeholder: 0, 128, 255;
+  --color-border-main: 186, 186, 186;
+  --color-border-blocks: 200, 200, 200;
+  --color-btn-background: 0, 74, 179;
+  --border-dark-subtle: 5px solid rgb(170, 170, 170);
 }
