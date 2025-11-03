@@ -1,14 +1,14 @@
 
 
 <template>
-  <div class="top-navigation-bar">
+  <div class="asd">
     1545
   </div>
 </template>
 
 <style lang="scss">
-.top-navigation-bar{
-  width: 30%;
-  height: 30%;
+.asd{
+  width: 100%;
+  height: 100%;
 }
 </style>

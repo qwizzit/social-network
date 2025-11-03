@@ -5,6 +5,7 @@
   --gap-top-navigation: 110px;
   --gap-navigation: 30px;
   --gap-text: 25px;
+  --gap-home-pictures: 15px;
 
   --width-page: 1300px;
   --width-middle-page: 992px;
@@ -15,6 +16,8 @@
   --padding-profile-outer-blocks: 10px;
   --padding-profile-inner-blocks: 10px 20px;
   --padding-album-spacer: 10px;
+  --padding-home-pictures: 5px;
+  --padding-left-and-right-content: 10px;
 
   --max-width-info-blocks: 250px;
 
@@ -23,4 +26,6 @@
   --size-blocks-user-profile: 220px;
   --size-drow-down-list: 200px;
   --max-size-router: 250px;
+
+  --max-width-main-info: calc(var(--width-page) - var(--width-page) / 4);
 }

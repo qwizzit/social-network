@@ -21,13 +21,13 @@ export const MainRouter = createRouter({
             children: [
                 {
                     name: 'Home',
-                    path: 'home',
+                    path: '',
                     component: Home,
                     redirect: '/home/content',
                     children: [
                         {
                             name: 'Content',
-                            path: 'content',
+                            path: '',
                             component: Content,
                         },
                         {

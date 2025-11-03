@@ -7,6 +7,18 @@ import news from "/src/assets/icons/mailbox-svgrepo-com.svg"
 import interviews from "/src/assets/icons/microphone-svgrepo-com.svg"
 import home from "/src/assets/icons/star-svgrepo-com.svg"
 import contacts from "/src/assets/icons/users-group-rounded-svgrepo-com.svg"
+const emit = defineEmits<{
+  (e: 'update:isImageWatching', value: typeof props.isImageWatching): void
+}>()
+const props = defineProps<{
+  isImageWatching: {
+    url: string,
+    toggle: boolean
+  }
+}>()
+function zoomImage(giveImage: {url: string, toggle: boolean}){
+  emit('update:isImageWatching', giveImage)
+}
 </script>
 
 <template>
@@ -48,7 +60,7 @@ import contacts from "/src/assets/icons/users-group-rounded-svgrepo-com.svg"
     </nav>
     <main class="main-info">
       <div class="content">
-        <RouterView />
+        <RouterView :isImageWatching="isImageWatching" @zoomPhoto="zoomImage" />
       </div>
       <div class="additional-content token-style">
         <div class="asd token-style">

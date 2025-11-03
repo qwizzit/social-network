@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import {UserDto} from "../Models/Dto/UserDto.ts";
-import {usersData} from "../composition/metods.ts";
-import {onMounted, ref} from "vue";
-import axios from "axios";
-import {AccessApi} from "../Api/AccessApi.ts";
-
+import { ref} from "vue";
+import {AccessApi, UserApi} from "../Api/AccessApi.ts";
 const enteredEmail = ref('');
 const enteredPassword = ref('');
-async function fetchData() {
-  const regUsers = await axios.get('https://jsonplaceholder.typicode.com/users')
-  localStorage.setItem('users', JSON.stringify(regUsers.data))
-}
-onMounted(fetchData);
-function checkEmail() {
+async function checkEmail() {
   let userId = -1;
-  usersData.getUsers().find((account : UserDto) => {
-    if(account.email === enteredEmail.value){
-      console.log(account.id)
-      userId = account.id
-    }
+  await UserApi.getAllUsers()
+      .then(async resp => {
+        resp.find((account : UserDto) => {
+          if(account.email === enteredEmail.value){
+            userId = account.id
+          }
+      })
   });
   return userId;
 }
@@ -30,13 +24,17 @@ function handleInput(data: 'password' | 'email', event: Event) {
     enteredPassword.value = (event.target as HTMLInputElement).value
   }
 }
-function isDataRight(){
-  const isId = checkEmail()
-  if(isId !== -1){
-    AccessApi.logIn(isId)
-  } else{
-    console.log('Invalid email')
-  }
+async function isDataRight(){
+  await checkEmail()
+      .then(resp => {
+        if(resp !== -1){
+          // console.log(resp)
+          AccessApi.logIn(resp)
+        } else{
+          console.log('Invalid email')
+        }
+      })
+
 }
 
 </script>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import {onMounted, ref } from "vue";
+import { ref } from "vue";
 import {AccessApi} from "../Api/AccessApi.ts";
-import axios from "axios";
-import {AlbumDto} from "../Models/Dto/AlbumDto.ts";
 import userCircle from "/src/assets/icons/user-circle-svgrepo-com.svg"
 import bell from "/src/assets/icons/bell-svgrepo-com.svg"
 
 import {isUser} from "../composition/metods.ts";
+import Modal from "./Modal.vue";
 
 const isAvatar = ref(false)
 const emit =  defineEmits<{
@@ -15,7 +14,7 @@ const emit =  defineEmits<{
 const props = defineProps<{
   darkTheme: boolean,
 }>()
-
+const isImageWatching = ref({url: 'asd', toggle: false})
 function changeTheme() {
   if(!props.darkTheme){
     localStorage.setItem('theme', 'dark');
@@ -25,21 +24,6 @@ function changeTheme() {
     emit('update:darkTheme', false);
   }
 }
-
-function fetchData() {
-  axios.get('https://jsonplaceholder.typicode.com/posts')
-      .then(resp => localStorage.setItem('posts', JSON.stringify(resp.data)));
-
-  axios.get('https://jsonplaceholder.typicode.com/albums')
-      .then(resp => localStorage.setItem('albums', JSON.stringify(resp.data)));
-
-  axios.get<AlbumDto[]>('https://jsonplaceholder.typicode.com/photos')
-      .then(resp => localStorage.setItem('photos', JSON.stringify(resp.data)));
- }
-
-onMounted(() => {
-  fetchData();
-});
 </script>
 
 <template>
@@ -88,18 +72,38 @@ onMounted(() => {
         </div>
       </nav>
     </div>
-    <router-view />
+
+    <router-view v-model:isImageWatching="isImageWatching" />
+  </div>
+  <div
+    v-if="isImageWatching.toggle"
+    class="watch-image"
+    @click.self="isImageWatching.toggle = !isImageWatching.toggle"
+  >
+    <Modal :imageUrl="isImageWatching.url" />
   </div>
 </template>
 
 <style lang="scss">
 .token-style {
-  color: rgba(var(--color-font), 1);
-  background: rgba(var(--color-main-bg), 1);
+  color: rgb(var(--color-font));
+  background: rgb(var(--color-main-bg));
   border-radius: 15px;
   text-decoration: none;
   width: 100%;
   height: 100%;
+}
+.watch-image{
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(var(--color-main-bg), 0.3);
 }
 .full-page {
 
@@ -121,8 +125,8 @@ onMounted(() => {
       border-radius: unset;
       width: var(--width-page);
       padding: 0 calc(10px + var(--padding-left-router));
-      border-bottom: 1px solid rgba(var(--color-border-blocks), 1);
-      background: rgba(var(--color-second-bg), 1);
+      border-bottom: 1px solid rgb(var(--color-border-blocks));
+      background: rgb(var(--color-second-bg));
       justify-content: space-between;
       align-items: center;
       justify-items: center;
@@ -154,7 +158,7 @@ onMounted(() => {
         }
         .create {
           display: block;
-          background: rgba(var(--color-btn-background), 1);
+          background: rgb(var(--color-btn-background));
           box-shadow: -1px 2px rgba(var(--color-box-shadow-btn), 0.5);
           width: 140px;
           height: 40px;
@@ -164,7 +168,7 @@ onMounted(() => {
 
         .assistant {
           display: block;
-          background: rgba(var(--color-btn-background), 1);
+          background: rgb(var(--color-btn-background));
           box-shadow: -1px 2px rgba(var(--color-box-shadow-btn), 0.5);
           width: 140px;
           height: 40px;
@@ -184,7 +188,7 @@ onMounted(() => {
         .bell {
           display: block;
           background: unset;
-          color: rgba(var(--color-font), 1);
+          color: rgb(var(--color-font));
           border: unset;
           width: 30px;
           height: 30px;
@@ -210,7 +214,7 @@ onMounted(() => {
             max-width: var(--size-drow-down-list);
             border: 2px solid rgba(var(--color-border-main), 0.38);
             list-style: none;
-            background: rgba(var(--color-main-bg), 1);
+            background: rgb(var(--color-main-bg));
 
             .btn-list {
               display: flex;
@@ -224,7 +228,7 @@ onMounted(() => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                background: rgba(var(--color-btn-background), 1);
+                background: rgb(var(--color-btn-background));
                 max-width: 150px;
                 height: 50px;
               }
@@ -261,7 +265,7 @@ onMounted(() => {
         min-width: 150px;
         max-width: var(--max-size-router);
         height: 50px;
-        background: rgba(var(--color-second-bg), 1);
+        background: rgb(var(--color-second-bg));
         .icon-router{
           width: 25px;
           height: 25px;
@@ -278,7 +282,7 @@ onMounted(() => {
         align-items: center;
         max-width: var(--max-size-router);
         height: 50px;
-        background: rgba(var(--color-second-bg), 1);
+        background: rgb(var(--color-second-bg));
         .icon-router{
           width: 25px;
           height: 25px;
@@ -289,12 +293,12 @@ onMounted(() => {
       display: flex;
       flex-direction: row;
       gap:  var(--gap-page);
-      max-width: calc(var(--width-page) - var(--width-page) / 4);
+      max-width: var(--max-width-main-info);
       width: 100%;
       //width: calc(var(--width-page) / 2);
       .content {
-        color: rgba(var(--color-font), 1);
-        padding: 0 10px;
+        color: rgb(var(--color-font));
+        padding: 0 var(--padding-left-and-right-content);
         gap: 20px;
         display: flex;
         flex-direction: column;
@@ -304,7 +308,7 @@ onMounted(() => {
         max-width: calc(var(--width-page) / 4);
         width: 100%;
         .asd{
-          background: rgba(var(--color-second-bg), 1);
+          background: rgb(var(--color-second-bg));
           aspect-ratio:  1 / 1;
         }
       }
@@ -425,7 +429,7 @@ onMounted(() => {
           height: 100%;
           justify-content: center;
           border-radius: unset;
-          background: rgba(var(--color-second-bg), 1);
+          background: rgb(var(--color-second-bg));
           .router-text{
             display: none;
           }

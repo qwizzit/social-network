@@ -1,46 +1,68 @@
 <script setup lang="ts">
 import PostComponent from "./PostComponent.vue";
-import {getRandomInt, randomPhoto, randomUser, usersData} from "../composition/metods.ts";
+import {getRandomInt, imageUrlAlt, randomUser} from "../composition/metods.ts";
 import {onMounted, ref} from "vue";
 import {randomUserPost} from "../Models/InterfaceRandomUserPost.ts";
-
-// localStorage.removeItem('uploadedPosts');
+import {PostApi, randomPhoto, UserApi} from "../Api/AccessApi.ts";
+const emit = defineEmits<{
+  (e: 'zoomPhoto', value: typeof props.isImageWatching): void
+}>()
+const props = defineProps<{
+  isImageWatching: {
+    url: string,
+    toggle: boolean
+  }
+}>()
 const posts = ref<randomUserPost[]>([])
 const postsId = <number[]>[]
-const allUsers = usersData.getUsers()
-const userAndPhoto = randomPhoto(randomUser());
-function fetchPosts() {
+let userPhoto = ''
+randomPhoto(randomUser())
+    .then(resp => {
+      userPhoto = resp
+    })
+async function fetchPosts() {
   const requiredNumberOfPosts = 20
-  const isPosts = localStorage.getItem("uploadedPosts");
-  if (!isPosts) {
-    if(posts.value.length !== requiredNumberOfPosts) {
-      for (let numberOfPost = 0; posts.value.length < requiredNumberOfPosts; numberOfPost++) {
-        const newPost = randomPost()
-        if(newPost){
-          posts.value[numberOfPost] = newPost
-        } else{
-          numberOfPost--
-        }
-
-      }
-      localStorage.setItem("uploadedPosts", JSON.stringify(posts.value));
+  if(posts.value.length !== requiredNumberOfPosts) {
+    for (let numberOfPost = 0; posts.value.length < requiredNumberOfPosts; numberOfPost++) {
+      await randomPost()
+          .then(resp => {
+            if (resp) {
+              posts.value[numberOfPost] = resp
+            } else {
+              numberOfPost--
+            }
+          })
     }
-  } else{
-    posts.value = usersData.getUploadedPosts()
   }
 }
-function randomPost() {
-  const allPosts = usersData.getPosts()
+async function randomPost() {
   let user = {userId: -1, userName: '', photoUrl: '', post: {id: -1, body: '', title: ''}}
   user.userId = getRandomInt(1, 10);
-  user.userName = allUsers[user.userId - 1].name;
-  const post = getRandomInt((user.userId - 1) * 10 + 1, (user.userId - 1) * 10 + 10);
-  if(!postsId.includes(post)){
-    postsId.push(post);
-    user.post = allPosts[post];
+  const userInfo = UserApi.getUser(user.userId)
+  const postInfo = PostApi.getAllUserPosts(user.userId)
+  let isReturn = undefined
+  await Promise.all([userInfo, postInfo])
+      .then(([respUser, respPost]) => {
+        user.userName = respUser.name
+        const {userId, ...post} = respPost[getRandomInt(0, 10)];
+        user.post = {...post}
+      }).then(() => {
+        if(!postsId.includes(user.post.id)){
+          postsId.push(user.post.id);
+          isReturn = true
+        }
+  })
+  if(isReturn){
     return user
   }
-  return undefined;
+  return isReturn
+}
+function zoomImage(event: Event){
+  const giveImage = {
+    url: event.target.src,
+    toggle: true
+  }
+  emit('zoomPhoto', giveImage)
 }
 onMounted(fetchPosts)
 </script>
@@ -48,20 +70,15 @@ onMounted(fetchPosts)
 <template>
   <div class="short-pictures-content token-style">
     <img
-      alt="1"
+      v-for="n in 3"
+      :key="n"
       class="short-content token-style"
-      :src="userAndPhoto"
+      :alt="n.toString()"
+      :src="userPhoto"
+      @click="zoomImage"
+      @error="imageUrlAlt"
     >
-    <img
-      alt="2"
-      class="short-content token-style"
-      :src="userAndPhoto"
-    >
-    <img
-      alt="3"
-      class="short-content token-style"
-      :src="userAndPhoto"
-    >
+    <!--    @error="imageUrlAlt" -->
   </div>
   <div class="all-info">
     <PostComponent
@@ -75,21 +92,22 @@ onMounted(fetchPosts)
 
 <style lang="scss">
 .short-pictures-content {
-  width: auto;
-  height: auto;
   gap: 15px;
   padding: 5px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-
   .short-content {
     height: auto;
     background: white;
     aspect-ratio: 1 / 1;
+    object-fit: cover;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-width: 0;
+    max-width: calc((var(--max-width-main-info) - var(--width-page) / 4 - var(--padding-home-pictures) * 2 - var(--gap-home-pictures) * 2 - var(--gap-page) - var(--padding-left-and-right-content) * 2) / 3);
+
   }
 }
 .all-info {

@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
-import {UserDto} from "../Models/Dto/UserDto.ts";
-import {randomPhoto, usersData} from "../composition/metods.ts";
-import {AlbumDto} from "../Models/Dto/AlbumDto.ts";
-import {PhotoDto} from "../Models/Dto/PhotoDto.ts";
+import {getRandomInt, imageUrlAlt} from "../composition/metods.ts";
 import leftArrow from "/src/assets/icons/left-arrow.svg";
-import {AlbumsApi} from "../Api/AccessApi.ts";
+import {AlbumsApi, randomPhoto, UserApi} from "../Api/AccessApi.ts";
+const emit = defineEmits<{
+  (e: 'update:isImageWatching', value: typeof props.isImageWatching): void
+}>()
 const props = defineProps<{
+  isImageWatching: {
+    url: string,
+    toggle: boolean
+  }
   id: string,
 }>()
-const user = ref({mainInfo: {
+
+const user = ref({
+  mainInfo: {
     id: parseInt(props.id), name: '', username: '', email: '',
     address: {
       street: '',
@@ -34,27 +40,31 @@ const user = ref({mainInfo: {
     lastAlbumId: -1
   }
 })
-const photosInAlbums = ref<PhotoDto[][]>([])
+
+const albums = ref<{ title: string, id: number, userId: number, images: string[] }[]>([])
 const openedAlbums = ref<number[]>([])
-const allPhotos = usersData.getPhotos()
-const albumPreview = ref<PhotoDto[]>([])
+const albumPreview = ref<string[]>([])
 const isMoreAlbums = ref(false)
+let userPhoto = ''
+randomPhoto(getRandomInt(0, 10))
+    .then(resp => {
+      userPhoto = resp
+    })
 
 const visibleAlbums = computed(() => {
   if (isMoreAlbums.value) {
-    return Array.from({ length: photosInAlbums.value.length }, (_, i) => i)
+    return albums.value
   } else {
-    return Array.from({ length: Math.min(3, photosInAlbums.value.length) }, (_, i) => i)
+    return albums.value.slice(0, 3)
   }
 })
 const initMap = () => {
   const mapElement = document.getElementById('google-api');
-    if (mapElement && window.google?.maps) {
+  if (mapElement && window.google?.maps) {
     const options = {
       center: {lat: parseInt(user.value.mainInfo.address.geo.lat), lng: parseInt(user.value.mainInfo.address.geo.lng)},
       zoom: 4
     };
-
     new google.maps.Map(mapElement, options);
   }
 };
@@ -64,58 +74,81 @@ const loadGoogleMaps = () => {
     initMap();
     return;
   }
-
   const script = document.createElement('script');
   script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBb8TpBdAAKD81c10mDYqZcyz04x6-Ng94';
   script.async = true;
   script.defer = true;
-
   script.onload = () => {
     initMap();
   };
-
   document.head.appendChild(script);
 };
+function zoomImage(event: Event){
+  const giveImage = {
+    url: event.target.src,
+    toggle: true
+  }
+  emit('update:isImageWatching', giveImage)
+}
 function loadPreview(){
-  let indexPreviewOfAlbums = <number[]>[]
-  allPhotos.forEach((photo: PhotoDto) => {
-    if(photo.albumId >= user.value.albums.firstAlbumId && photo.albumId <= user.value.albums.lastAlbumId && !indexPreviewOfAlbums.includes(photo.albumId)) {
-      albumPreview.value.push(photo)
-      indexPreviewOfAlbums.push(photo.albumId)
+  albums.value.forEach((album: {title: string, userId: number, images: string[]}) => {
+    if(!albumPreview.value.includes(album.images[0])) {
+      albumPreview.value.push(album.images[0])
     }
   })
 }
-function whoseUserProfile() {
-  const allUsers = usersData.getUsers()
-  const allAlbums = usersData.getAlbums()
-  user.value.mainInfo = allUsers.find((user: UserDto) => user.id === parseInt(props.id))!
-  const userAlbums = allAlbums.filter((album : AlbumDto) => album.userId === user.value.mainInfo.id)
-  user.value.albums.firstAlbumId = userAlbums[0].id
-  user.value.albums.lastAlbumId = userAlbums[userAlbums.length - 1].id
-  for(let i = user.value.albums.firstAlbumId; i < user.value.albums.lastAlbumId; i++) {
-    photosInAlbums.value.push([])
+
+async function whoseUserProfile() {
+  UserApi.getUser(parseInt(props.id))
+      .then(resp => {
+        user.value.mainInfo = resp
+      })
+  await AlbumsApi.getAllUserAlbums(parseInt(props.id))
+      .then(resp => {
+        user.value.albums.firstAlbumId = resp[0].id
+        user.value.albums.lastAlbumId = resp[resp.length - 1].id
+      }).then(() => {
+        uploadedNeededAlbums(user.value.albums.firstAlbumId, user.value.albums.firstAlbumId + 3)
+      })
+}
+
+
+function uploadAlbum(albumId: number) {
+  AlbumsApi.getUserAlbum(parseInt(props.id), albumId)
+      .then(resp => {
+        albums.value.push(resp)
+      })
+}
+
+function remainingAlbums(indexFirstAlbum: number, indexLastAlbum: number){
+  uploadedNeededAlbums(indexFirstAlbum, indexLastAlbum)
+  isMoreAlbums.value = !isMoreAlbums.value
+}
+
+function uploadedNeededAlbums(indexFirstAlbum: number, indexLastAlbum: number){
+  for(let albumId = indexFirstAlbum; albumId < indexLastAlbum; albumId++){
+    uploadAlbum(albumId)
   }
   loadPreview();
 }
-function uploadPhotos(albumId: number) {
 
-  const updatedPhotos = [...photosInAlbums.value];
-  updatedPhotos[albumId - user.value.albums.firstAlbumId] = allPhotos.filter((photo: PhotoDto) => photo.albumId === albumId)
+function isAlbumOpened(albumId: number): boolean {
+  return openedAlbums.value.includes(albumId);
+}
+
+function toggleAlbum(albumId: number) {
   const index = openedAlbums.value.indexOf(albumId);
   if (index > -1) {
     openedAlbums.value.splice(index, 1);
   } else {
-    openedAlbums.value.push(albumId - user.value.albums.firstAlbumId);
+    openedAlbums.value.push(albumId);
   }
-  // console.log(photosInAlbums.value)
-  photosInAlbums.value = updatedPhotos;
-}
-function isAlbumOpened(albumId: number): boolean {
-  return openedAlbums.value.includes(albumId);
 }
 onMounted(() => {
-  whoseUserProfile();
-  loadGoogleMaps();
+  whoseUserProfile()
+      .then(() => {
+        loadGoogleMaps()
+      })
 });
 </script>
 
@@ -131,7 +164,7 @@ onMounted(() => {
       <div class="user-profile default-block">
         <div class="user-info">
           <div class="user-profile-avatar">
-            <img alt="user-avatar" :src="randomPhoto(parseInt(id))">
+            <img alt="user-avatar" :src="userPhoto">
           </div>
           <div class="addresses default-block">
             <a
@@ -157,43 +190,46 @@ onMounted(() => {
           <span class="name">Albums</span>
         </div>
         <div class="albums-spacer">
-          <div class="album-container">
-            <span class="name">Posted on update</span>
-            <div
-              v-for="albumId in visibleAlbums"
-              :key="albumId"
-              class="album"
-            >
+          <div
+            v-for="album in visibleAlbums"
+            :key="album.id"
+            class="album-container"
+          >
+            <span class="name">{{ album.title }}</span>
+            <div class="album">
               <img
-                v-if="!isAlbumOpened(albumId)"
+                v-if="!isAlbumOpened(album.id)"
                 alt="photo"
                 class="album-photo"
-                :src="albumPreview[albumId]?.url"
+                :src="album.images[0]"
+                @click="zoomImage"
+                @error="imageUrlAlt"
               >
               <div class="more-album-photos">
                 <a
-                  v-if="!isAlbumOpened(albumId)"
+                  v-if="!isAlbumOpened(album.id)"
                   class="btn-more-albums"
-                  @click="uploadPhotos(albumId + user.albums.firstAlbumId)"
+                  @click="toggleAlbum(album.id)"
                 >
                   More pictures...
                 </a>
-                <div v-if="isAlbumOpened(albumId)" class="photos">
+                <div v-if="isAlbumOpened(album.id)" class="photos">
                   <img
-                    v-for="(photo, photoId) in photosInAlbums[albumId]"
-                    :key="photoId"
+                    v-for="photo in album.images"
+                    :key="photo"
                     alt="photo"
                     class="album-photo"
-                    :src="photo.url"
+                    :src="photo"
+                    @error="imageUrlAlt"
                   >
                 </div>
               </div>
             </div>
-            <div v-if="!isMoreAlbums && photosInAlbums.length > 3">
-              <a class="btn-more-albums" @click="isMoreAlbums = !isMoreAlbums">
-                More albums... ({{ photosInAlbums.length - 3 }} left)
-              </a>
-            </div>
+          </div>
+          <div v-if="!isMoreAlbums">
+            <a class="btn-more-albums" @click="remainingAlbums(user.albums.firstAlbumId + 3, user.albums.lastAlbumId)">
+              More albums... ({{ user.albums.lastAlbumId - user.albums.firstAlbumId + 1 - visibleAlbums.length }} left)
+            </a>
           </div>
         </div>
       </div>
@@ -345,6 +381,7 @@ onMounted(() => {
           justify-content:  center;
           .album{
             display: flex;
+
             width: 100%;
             overflow-x: auto;
             gap: var(--gap-page);
@@ -452,8 +489,8 @@ onMounted(() => {
         //max-width: calc(var(--width-smaller-page) * 2 / 3 - 10px - var(--gap-page) / 2);
         .albums-spacer{
 
-          .album-container{
-            .album{
+          .album{
+            .album-container{
               min-width: 0;
               flex-shrink: 1;
             }
@@ -514,8 +551,8 @@ onMounted(() => {
       .all-albums{
         //max-width: 355px;
         .albums-spacer{
-          .album-container{
-            .album{
+          .album{
+            .album-container{
 
             }
           }

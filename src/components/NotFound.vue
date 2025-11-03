@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onMounted, ref} from "vue";
+import { ref} from "vue";
 
 const currentComponent = ref(false)
 
