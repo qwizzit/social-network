@@ -46,8 +46,8 @@ export function randomUser() {
     return getRandomInt(1, 10)
 }
 export const imageFiles = Object.values(import.meta.glob('/src/assets/pictures/*', { eager: true, as: 'url' }))
-export function imageUrlAlt(event: Event) { //  узнать чо не так
-    event.target.src = imageFiles[getRandomInt(0, imageFiles.length)];
+export function imageUrlAlt(event: Event) {
+    (event.target as HTMLImageElement).src = imageFiles[getRandomInt(0, imageFiles.length)];
 }
 
 

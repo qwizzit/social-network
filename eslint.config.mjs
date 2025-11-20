@@ -87,7 +87,7 @@ export default [
       "vue/html-comment-content-spacing": [ "error", "always" ],
       "vue/html-comment-indent": [ "error", "tab" ],
       "vue/max-template-depth": [ "warn", {
-        maxDepth: 10
+        maxDepth: 7
       } ],
       "vue/no-boolean-default": [ "error", "default-false" ],
       "vue/no-empty-component-block": [ "error" ],

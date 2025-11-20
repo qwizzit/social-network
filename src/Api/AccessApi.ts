@@ -16,8 +16,6 @@ export const AccessApi = {
     }
 }
 
-
-
 export const UserApi = {
     async getAllUsers() : Promise<UserDto[]>{
         return await axios.get(`https://jsonplaceholder.typicode.com/users`)
@@ -27,18 +25,14 @@ export const UserApi = {
     },
     async getUser(userId: number): Promise<UserDto>{
         return await axios.get(`https://jsonplaceholder.typicode.com/users/${userId}`)
-            .then(resp => {
-                return resp.data
-            })
+            .then(resp => resp.data)
     }
 }
 
 export const PostApi = {
     async getAllUserPosts(userID: number) : Promise<PostDto[]> {
         return await axios.get(`https://jsonplaceholder.typicode.com/users/${userID}/posts`)
-            .then(resp => {
-                return resp.data
-            })
+            .then(resp => resp.data)
     },
     // async getUserPost(userID: number, postId: number){
     //     return this.getAllUserPosts(userID)
@@ -48,15 +42,11 @@ export const PostApi = {
     // }
 }
 export async function randomPhoto(userId: number){
-    let photoUrl = ''
-    await AlbumsApi.getAllUserAlbums(userId)
+    return await AlbumsApi.getAllUserAlbums(userId)
         .then(async resp => {
-            await AlbumsApi.getUserAlbum(userId, resp[getRandomInt(0, 10)].id)
-                .then(resp => {
-                    photoUrl = resp.images[getRandomInt(0, 50)]
-                })
+            return await AlbumsApi.getUserAlbum(userId, resp[getRandomInt(0, 10)].id)
+                .then(resp => resp.images[getRandomInt(0, 50)])
         })
-    return photoUrl
 }
 export const AlbumsApi = {
     async getAllUserAlbums(userID: number) : Promise<AlbumDto[]>{
@@ -68,12 +58,9 @@ export const AlbumsApi = {
     async getUserAlbum(userID: number, albumId: number) {
         return this.getAllUserAlbums(userID)
             .then(async resp => {
-                const photosInAlbum = await axios.get(`https://jsonplaceholder.typicode.com/albums/${albumId}/photos`)
-                    .then(resp => {
-                        const arrayPhotosOfAlbum = resp.data.map((photo: PhotoDto) => photo.url) as string[]
-                        return arrayPhotosOfAlbum
-
-                    })
+                const photosInAlbum = await axios
+                    .get(`https://jsonplaceholder.typicode.com/albums/${albumId}/photos`)
+                    .then(resp => resp.data.map((photo: PhotoDto) => photo.url) as string[])
                 return {
                     title: resp[albumId % 10].title as string,
                     id: resp[albumId % 10].id as number,
@@ -81,6 +68,6 @@ export const AlbumsApi = {
                     images: photosInAlbum
                 }
             })
-            }
     }
+}
 

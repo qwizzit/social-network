@@ -1,7 +1,7 @@
 html{
   height: 100svh;
   margin: 0 auto;
-  background: rgba(var(--color-main-bg), 1);
+  background: rgb(var(--color-main-bg));
   overflow-y: scroll;
 
 }
@@ -15,7 +15,7 @@ html{
 
 #app{
 
-  background-color: rgba(var(--color-main-bg), 1);
+  background-color: rgb(var(--color-main-bg));
   font-family: CustomFont;
   //display: flex;
   //justify-content: center;

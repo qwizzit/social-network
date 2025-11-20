@@ -9,7 +9,14 @@ export const PublicRouter = createRouter({
             name: 'PublicComponent',
             path: '/signin',
             component: PublicComponent,
-            meta: { requiresAuth: false },
+        },
+        {
+            path: '/:type(messages|user)/:catchAll(.*)*',
+            redirect: '/signin'
+        },
+        {
+            path: '/',
+            redirect: '/signin'
         },
         {
             path: '/:notFound(.*)*',

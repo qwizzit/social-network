@@ -12,7 +12,6 @@ import NotFound from "../components/NotFound.vue";
 export const MainRouter = createRouter({
     history: createWebHistory(),
     routes: [
-
         {
             path: '/',
             name: 'Main',
@@ -36,7 +35,6 @@ export const MainRouter = createRouter({
                             component: Messages,
                         }
                     ]
-
                 },
                 {
                     name: 'Profile',
@@ -46,7 +44,6 @@ export const MainRouter = createRouter({
                 },
             ]
         },
-
         {
             name: 'NotFound',
             path: '/:notFound(.*)*',
