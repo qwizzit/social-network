@@ -76,7 +76,7 @@ function zoomImage(giveImage: {url: string, toggle: boolean}){
 .navigation {
   max-width: 300px;
   display: flex;
-  padding-left: var(--padding-left-router);
+  //padding-left: var(--padding-left-router);
   flex-direction: column;
   gap: var(--gap-navigation);
   align-items: center;

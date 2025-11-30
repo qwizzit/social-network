@@ -10,9 +10,9 @@ const emit =  defineEmits<{
 const props = defineProps<{
   darkTheme: boolean,
 }>()
-const isImageWatching = ref({url: '', toggle: false})
+const imageSrc = ref<string>()
 function updateImageWatching(image: isImageWatchingInterface){
-  isImageWatching.value = image;
+  imageSrc.value = image.url
 }
 function changeTheme(theme: boolean) {
   if (theme){
@@ -22,26 +22,36 @@ function changeTheme(theme: boolean) {
   }
   emit('update:darkTheme', theme);
 }
+
+function closeModal() {
+  imageSrc.value = undefined
+}
 </script>
 
 <template>
   <div class="full-page">
     <div class="top-navigation-bar">
-      <MainHeader :darkTheme="darkTheme" @changeTheme="changeTheme" />
+      <MainHeader
+        class="asdfasdfasdf"
+        :darkTheme="darkTheme"
+        @changeTheme="changeTheme"
+      />
     </div>
     <div class="page">
       <router-view @isImageWatching="updateImageWatching" />
     </div>
   </div>
+
+  <Modal
+    v-if="!!imageSrc"
+    :imageUrl="imageSrc"
+    @close="closeModal"
+  />
   <div
-    v-if="isImageWatching.toggle"
+    v-if="imageSrc"
     class="watch-image"
-    @click.self="isImageWatching.toggle = !isImageWatching.toggle"
-  >
-    <Modal
-      :imageUrl="isImageWatching.url"
-    />
-  </div>
+    @click.self="imageSrc = undefined"
+  />
 </template>
 
 <style lang="scss">
@@ -76,7 +86,6 @@ function changeTheme(theme: boolean) {
     gap: var(--gap-page);
     padding-top: 10px;
     margin-top: calc(var(--gap-page) + var(--size-top-navigation));
-    justify-content: center;
   }
 }
 
