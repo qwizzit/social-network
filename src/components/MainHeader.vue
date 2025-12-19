@@ -128,15 +128,8 @@ function changeTheme(theme: boolean){
 @media (max-width: 992px) {
   .top-navigation-bar{
     .top-navigation {
-      .home {
-        width: 150px;
-      }
-      .search-content {
-        gap: 20px;
-      }
       .user-implication {
-        padding-right: unset;
-        max-width: 55px;
+        max-width: 60px;
       }
     }
   }

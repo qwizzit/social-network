@@ -4,18 +4,19 @@ import {getRandomInt, imageUrlAlt, randomUser} from "../composition/metods.ts";
 import {onMounted, ref} from "vue";
 import {randomUserPost} from "../Models/InterfaceRandomUserPost.ts";
 import {PostApi, randomPhoto, UserApi} from "../Api/AccessApi.ts";
-import {isImageWatchingInterface} from "../Models/isImageWatchingInterface.ts";
-const emit = defineEmits<{
-  (e: 'zoomPhoto', value: isImageWatchingInterface): void
-}>()
+import ImgModal from "./ImgModal.vue";
 
 const posts = ref<randomUserPost[]>([])
 const postsId = <number[]>[]
+const imageSrc = ref<string>()
+
 let userPhoto = ''
+
 randomPhoto(randomUser())
     .then(resp => {
       userPhoto = resp
     })
+
 async function fetchPosts() {
   const requiredNumberOfPosts = 20
   if(posts.value.length !== requiredNumberOfPosts) {
@@ -53,13 +54,14 @@ async function randomPost() {
   }
   return isReturn
 }
-function zoomImage(event: Event){
-  const giveImage = {
-    url: (event.target as HTMLImageElement).src,
-    toggle: true
-  }
-  emit('zoomPhoto', giveImage)
+
+function watchImage(event: Event){
+  imageSrc.value = (event.target as HTMLImageElement).src
 }
+function closeModal() {
+  imageSrc.value = undefined
+}
+
 onMounted(fetchPosts)
 </script>
 
@@ -71,10 +73,9 @@ onMounted(fetchPosts)
       class="short-content token-style"
       :alt="n.toString()"
       :src="userPhoto"
-      @click="zoomImage"
+      @click="watchImage"
       @error="imageUrlAlt"
     >
-    <!--    @error="imageUrlAlt" -->
   </div>
   <div class="all-info">
     <PostComponent
@@ -83,9 +84,19 @@ onMounted(fetchPosts)
       :user="userPost"
     />
   </div>
+  <teleport to="body">
+    <transition name="modal-drop">
+      <ImgModal
+        v-if="!!imageSrc"
+        :imageUrl="imageSrc"
+        @close="closeModal"
+      />
+    </transition>
+  </teleport>
 </template>
 
 <style lang="scss">
+
 .short-pictures-content {
   gap: 15px;
   padding: 5px;
@@ -95,6 +106,7 @@ onMounted(fetchPosts)
   align-items: center;
   .short-content {
     height: auto;
+    cursor: pointer;
     background: white;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -111,11 +123,11 @@ onMounted(fetchPosts)
   gap: var(--gap-posts);
   align-items: center;
 }
-@media (max-width: 1200px) {
-  .short-pictures-content{
-    //max-height: 320px;
-  }
-}
+//@media (max-width: 1200px) {
+//  .short-pictures-content{
+//    //max-height: 320px;
+//  }
+//}
 
 @media (max-width: 992px) {
   .all-info {

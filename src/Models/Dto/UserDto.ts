@@ -1,7 +1,7 @@
 export interface UserDto {
     id: number;
     name: string;
-    username: string;
+    userName: string;
     email: string;
     address: {
         street: string;

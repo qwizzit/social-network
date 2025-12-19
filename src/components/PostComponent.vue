@@ -5,12 +5,18 @@ import whiteLikeIcon from "/src/assets/icons/heart-svgrepo-com.svg"
 import shareIcon from "/src/assets/icons/share-svgrepo-com.svg"
 import commentIcon from "/src/assets/icons/password-minimalistic-svgrepo-com.svg"
 import {randomUserPost} from "../Models/InterfaceRandomUserPost.ts";
+import PostModal from "./PostModal.vue";
+
 const props = defineProps<{
   user: randomUserPost
 }>()
+
+const isPostModal = ref(false)
 const postLikes = ref(0)
 const currentColor = ref('white')
+
 postLikes.value = getRandomInt(1, 100)
+
 function changeColor(){
   if(currentColor.value === 'white'){
     currentColor.value = 'red'
@@ -21,26 +27,25 @@ function changeColor(){
 
   }
 }
-// randomPost()
 </script>
 
 <template>
   <div class="post">
-    <div class="user-post-avatar">
-      <router-link :to="{name: 'Profile', params: {id: user.userId}}">
+    <router-link class="user-post-link" :to="{name: 'Profile', params: {id: user.userId}}">
+      <div class="user-post-profile">
         <img
           alt=""
           class="post-avatar"
           :src="user.photoUrl"
         >
-      </router-link>
-      {{ user.userName }}
-    </div>
-    <div class="post-info">
+        {{ user.userName }}
+      </div>
+    </router-link>
+    <div class="post-info" @click="isPostModal = !isPostModal">
       {{ user.post.body }}
     </div>
     <div class="post-interactive">
-      <div class="like">
+      <div class="post-like">
         <span>{{ postLikes }}</span>
         <whiteLikeIcon
           class="post-icon"
@@ -48,15 +53,29 @@ function changeColor(){
           @click="changeColor"
         />
       </div>
-      <div class="comment">
+      <div class="post-comment" @click="isPostModal = !isPostModal">
         <commentIcon class="post-icon" />
         <span>Comment</span>
       </div>
-      <div class="share">
+      <div class="post-share">
         <shareIcon class="post-icon" />
         <span>Share</span>
       </div>
     </div>
+  </div>
+  <div>
+    <teleport to="body">
+      <transition name="modal-drop">
+        <PostModal
+          v-if="isPostModal"
+          :currentColor="currentColor"
+          :postLikes="postLikes"
+          :userPost="user"
+          @changeLikeColor="changeColor"
+          @close="isPostModal = !isPostModal"
+        />
+      </transition>
+    </teleport>
   </div>
 </template>
 
@@ -69,20 +88,26 @@ function changeColor(){
   width: 100%;
   padding: 15px;
   gap: var(--gap-posts);
-  .user-post-avatar{
-    display: flex;
-    gap: var(--gap-picture);
-    align-items: center;
-    .post-avatar{
-      width: 40px;
-      height: 40px;
+  .user-post-link{
+    width: fit-content;
+    color: rgb(var(--color-font));
+    text-decoration: none;
+    .user-post-profile{
+      display: flex;
+      gap: var(--gap-picture);
+      align-items: center;
+      .post-avatar{
+        width: 40px;
+        height: 40px;
+      }
     }
   }
   .post-interactive{
     display: flex;
+    color: rgb(var(--color-font));
     gap: 20px;
     max-height: 30px;
-    .like{
+    .post-like{
       display: flex;
       gap: 10px;
       align-items: center;
@@ -97,7 +122,7 @@ function changeColor(){
         transform: scale(0.88);
       }
     }
-    .comment {
+    .post-comment {
       display: flex;
       gap: 10px;
       align-items: center;
@@ -106,7 +131,7 @@ function changeColor(){
         width: 25px;
       }
     }
-    .share{
+    .post-share{
       display: flex;
       gap: 10px;
       align-items: center;

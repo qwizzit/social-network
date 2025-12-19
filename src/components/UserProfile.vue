@@ -5,12 +5,8 @@ import {AlbumsApi, UserApi} from "../Api/AccessApi.ts";
 import UserMainInfo from "./UserMainInfo.vue";
 import GoogleApi from "./GoogleApi.vue";
 import UserAlbums from "./UserAlbums.vue";
-import {isImageWatchingInterface} from "../Models/isImageWatchingInterface.ts";
 import UserCompany from "./UserCompany.vue";
 
-const emit = defineEmits<{
-  (e: 'isImageWatching', value: isImageWatchingInterface): void
-}>()
 const props = defineProps<{
   id: string,
 }>()
@@ -52,9 +48,7 @@ async function whoseUserProfile() {
         user.value.albums.lastAlbumId = resp[resp.length - 1].id
       })
 }
-function zoomImage(giveImage: {url: string, toggle: boolean}){
-  emit('isImageWatching', giveImage)
-}
+
 onMounted(whoseUserProfile)
 
 </script>
@@ -80,7 +74,6 @@ onMounted(whoseUserProfile)
           <UserAlbums
             :id="user.mainInfo.id"
             :numbersOfAlbums="user.albums"
-            @zoomPhoto="zoomImage"
           />
         </div>
       </div>

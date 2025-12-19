@@ -2,10 +2,8 @@
 import {imageUrlAlt} from "../composition/metods.ts";
 import {computed, onMounted, ref} from "vue";
 import {AlbumsApi} from "../Api/AccessApi.ts";
-import {isImageWatchingInterface} from "../Models/isImageWatchingInterface.ts";
-const emit = defineEmits<{
-  (e: 'zoomPhoto', value: isImageWatchingInterface): void
-}>()
+import ImgModal from "./ImgModal.vue";
+
 const props = defineProps<{
   id: number;
   numbersOfAlbums: {
@@ -13,6 +11,7 @@ const props = defineProps<{
     lastAlbumId: number
   }
 }>()
+const imageSrc = ref<string>();
 const openedAlbums = ref<number[]>([])
 const albumPreview = ref<string[]>([])
 const isMoreAlbums = ref(false)
@@ -60,12 +59,11 @@ function toggleAlbum(albumId: number) {
     openedAlbums.value.push(albumId);
   }
 }
-function zoomImage(event: Event){
-  const giveImage = {
-    url: (event.target as HTMLImageElement).src,
-    toggle: true
-  }
-  emit('zoomPhoto', giveImage)
+function watchImage(event: Event){
+  imageSrc.value = (event.target as HTMLImageElement).src
+}
+function closeModal() {
+  imageSrc.value = undefined
 }
 onMounted(() => uploadedNeededAlbums(props.numbersOfAlbums.firstAlbumId, props.numbersOfAlbums.firstAlbumId + 3))
 </script>
@@ -83,7 +81,7 @@ onMounted(() => uploadedNeededAlbums(props.numbersOfAlbums.firstAlbumId, props.n
         alt="photo"
         class="album-photo"
         :src="album.images[0]"
-        @click="zoomImage"
+        @click="watchImage"
         @error="imageUrlAlt"
       >
       <div class="more-album-photos">
@@ -101,7 +99,7 @@ onMounted(() => uploadedNeededAlbums(props.numbersOfAlbums.firstAlbumId, props.n
             alt="photo"
             class="album-photo"
             :src="photo"
-            @click="zoomImage"
+            @click="watchImage"
             @error="imageUrlAlt"
           >
         </div>
@@ -113,9 +111,19 @@ onMounted(() => uploadedNeededAlbums(props.numbersOfAlbums.firstAlbumId, props.n
       More albums... ({{ numbersOfAlbums.lastAlbumId - numbersOfAlbums.firstAlbumId + 1 - visibleAlbums.length }} left)
     </a>
   </div>
+  <teleport to="body">
+    <transition name="modal-drop">
+      <ImgModal
+        v-if="!!imageSrc"
+        :imageUrl="imageSrc"
+        @close="closeModal"
+      />
+    </transition>
+  </teleport>
 </template>
 
 <style lang="scss">
+
 .album-container{
   //background: #505050;
   gap: var(--gap-page);
@@ -127,14 +135,13 @@ onMounted(() => uploadedNeededAlbums(props.numbersOfAlbums.firstAlbumId, props.n
   justify-content:  center;
   .album{
     display: flex;
-
     width: 100%;
     overflow-x: auto;
     gap: var(--gap-page);
     padding: 10px;
     border-bottom: var(--border-dark-subtle);
     .album-photo{
-      background: white;
+      cursor: pointer;
       box-shadow: 0 0 10px rgba(var(--color-box-shadow-avatars), 1);
       border-radius: 12px;
       width: 135px;

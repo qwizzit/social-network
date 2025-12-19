@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import Modal from "./Modal.vue";
 import MainHeader from "./MainHeader.vue";
-import {isImageWatchingInterface} from "../Models/isImageWatchingInterface.ts";
 
 const emit =  defineEmits<{
   (e: 'update:darkTheme', value: typeof props.darkTheme): void
@@ -10,10 +7,7 @@ const emit =  defineEmits<{
 const props = defineProps<{
   darkTheme: boolean,
 }>()
-const imageSrc = ref<string>()
-function updateImageWatching(image: isImageWatchingInterface){
-  imageSrc.value = image.url
-}
+
 function changeTheme(theme: boolean) {
   if (theme){
     localStorage.setItem('theme', 'dark');
@@ -23,35 +17,21 @@ function changeTheme(theme: boolean) {
   emit('update:darkTheme', theme);
 }
 
-function closeModal() {
-  imageSrc.value = undefined
-}
+
 </script>
 
 <template>
   <div class="full-page">
     <div class="top-navigation-bar">
       <MainHeader
-        class="asdfasdfasdf"
         :darkTheme="darkTheme"
         @changeTheme="changeTheme"
       />
     </div>
     <div class="page">
-      <router-view @isImageWatching="updateImageWatching" />
+      <router-view />
     </div>
   </div>
-
-  <Modal
-    v-if="!!imageSrc"
-    :imageUrl="imageSrc"
-    @close="closeModal"
-  />
-  <div
-    v-if="imageSrc"
-    class="watch-image"
-    @click.self="imageSrc = undefined"
-  />
 </template>
 
 <style lang="scss">
@@ -63,19 +43,7 @@ function closeModal() {
   width: 100%;
   height: 100%;
 }
-.watch-image{
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  top: 0;
-  z-index: 6;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: rgba(var(--color-main-bg), 0.3);
 
-}
 .full-page {
   display: flex;
   height: 100%;

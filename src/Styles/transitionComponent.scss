@@ -1,0 +1,19 @@
+.modal-drop-enter-active,
+.modal-drop-leave-active {
+  transition: opacity .5s ease;
+}
+
+.modal-drop-enter-from,
+.modal-drop-leave-to {
+  opacity: 0;
+}
+
+.modal-drop-enter-active .modal-content,
+.modal-drop-leave-active .modal-content {
+  transition: transform .5s ;
+}
+
+.modal-drop-enter-from .modal-content,
+.modal-drop-leave-to .modal-content {
+  transform: translateY(-200px);
+}

@@ -5,15 +5,8 @@ import news from "/src/assets/icons/mailbox-svgrepo-com.svg"
 import interviews from "/src/assets/icons/microphone-svgrepo-com.svg"
 import home from "/src/assets/icons/star-svgrepo-com.svg"
 import contacts from "/src/assets/icons/users-group-rounded-svgrepo-com.svg"
-import {isImageWatchingInterface} from "../Models/isImageWatchingInterface.ts";
 
-const emit = defineEmits<{
-  (e: 'isImageWatching', value: isImageWatchingInterface): void
-}>()
 
-function zoomImage(giveImage: {url: string, toggle: boolean}){
-  emit('isImageWatching', giveImage)
-}
 </script>
 
 <template>
@@ -58,7 +51,6 @@ function zoomImage(giveImage: {url: string, toggle: boolean}){
         <keep-alive include="Content">
           <component
             :is="Component"
-            @zoomPhoto="zoomImage"
           />
         </keep-alive>
       </RouterView>
@@ -163,7 +155,7 @@ function zoomImage(giveImage: {url: string, toggle: boolean}){
     z-index: 3;
     max-width: none;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: unset;
     gap: unset;
     .phones-router {
       padding-left: unset;
